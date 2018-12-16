@@ -1,0 +1,26 @@
+{
+  "name": "timeline-chart",
+  "version": "1.0.0",
+  "description": "",
+  "main": "timeline-chart.js",
+  "scripts": {
+    "build": "node ./node_modules/rollup/bin/rollup -c",
+    "watch": "node ./node_modules/rollup/bin/rollup -c --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sawada Makoto",
+  "license": "MIT",
+  "dependencies": {
+    "timespan": "^2.3.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.2.0",
+    "rollup": "^0.67.4",
+    "rollup-plugin-babel": "^4.1.0",
+    "rollup-plugin-babel-minify": "^6.2.0",
+    "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-node-resolve": "^4.0.0",
+    "rollup-watch": "^4.3.1"
+  }
+}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Sample</title>
+    <script src="../dist/TimelineChart.js"></script>
+</head>
+
+<body>
+    <h1>Sample</h1>
+
+    <canvas id="chart" width="500" height="50" />
+    <script>
+        var chart = new TimelineChart(document.getElementById('chart'), {
+            borderColor: 'gray',
+            data: [{
+                startTime: '00:00',
+                endTime: '020:00',
+                color: 'green'
+            }, {
+                startTime: '01:00',
+                endTime: '02:00',
+                color: 'red'
+            }]
+        });
+        chart.draw();
+    </script>
+</body>
+
+</html>
