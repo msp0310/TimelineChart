@@ -1,32 +1,50 @@
-import { TimeSpan } from "timespan";
+import { TimeSpan } from "timespan"
 
 /**
  * Time Unit Element.
  */
-export class TimeUnitElement {
-  public startTime: TimeSpan;
-  public endTime: TimeSpan;
-  public color: string;
+export default class TimeUnitElement {
+  public height: number
+  public startTime: TimeSpan
+  public endTime: TimeSpan
+  public color: string
+  public oneMinuteWidth: number
 
-  constructor(startTime: TimeSpan, endTime: TimeSpan, color: string) {
-    this.startTime = startTime;
-    this.endTime = endTime;
-    this.color = color || "#fff";
+  constructor(
+    height: number,
+    startTime: TimeSpan,
+    endTime: TimeSpan,
+    oneMinuteWidth: number,
+    color: string
+  ) {
+    this.height = height
+    this.startTime = startTime
+    this.endTime = endTime
+    this.oneMinuteWidth = oneMinuteWidth
+    this.color = color || "#fff"
   }
 
-  get offset(): number {
-    return this.startTime.totalMinutes();
+  public get totalMinutes(): number {
+    return this.endTime.totalMinutes() - this.startTime.totalMinutes()
   }
 
-  get totalMinutes(): number {
-    return this.endTime.totalMinutes() - this.startTime.totalMinutes();
+  public get width(): number {
+    return this.oneMinuteWidth * this.totalMinutes
   }
 
-  draw(canvas: HTMLCanvasElement) {}
+  public get x(): number {
+    const offset = this.startTime.totalMinutes() * this.oneMinuteWidth
+    // 1px is border
+    return offset + 1
+  }
 
-  onMouseMove() {}
+  public get y(): number {
+    // 1px is border
+    return 1
+  }
 
-  onMouseOut() {}
-
-  isMouseOver(x, y) {}
+  public draw(canvas: CanvasRenderingContext2D): void {
+    canvas.fillStyle = this.color
+    canvas.fillRect(this.x, this.y, this.width, this.height)
+  }
 }

@@ -1,5 +1,5 @@
 /*!
- * Timeline.js v0.1.0
+ * Timeline.js v0.1.1
  *
  * (c) 2018 Sawada Makoto.
  * Released under the MIT License
@@ -905,26 +905,23 @@
 	        this.borderColor = config.borderColor || '#000';
 	        this.backgroundColor = config.backgroundColor || '#fff';
 	        this.data = config.data;
+	        this.tooltip = config.tooltip;
 	    }
 	    return Config;
 	}());
+	//# sourceMappingURL=config.js.map
 
 	/**
 	 * Time Unit Element.
 	 */
 	var TimeUnitElement = /** @class */ (function () {
-	    function TimeUnitElement(startTime, endTime, color) {
+	    function TimeUnitElement(height, startTime, endTime, oneMinuteWidth, color) {
+	        this.height = height;
 	        this.startTime = startTime;
 	        this.endTime = endTime;
+	        this.oneMinuteWidth = oneMinuteWidth;
 	        this.color = color || "#fff";
 	    }
-	    Object.defineProperty(TimeUnitElement.prototype, "offset", {
-	        get: function () {
-	            return this.startTime.totalMinutes();
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
 	    Object.defineProperty(TimeUnitElement.prototype, "totalMinutes", {
 	        get: function () {
 	            return this.endTime.totalMinutes() - this.startTime.totalMinutes();
@@ -932,12 +929,77 @@
 	        enumerable: true,
 	        configurable: true
 	    });
-	    TimeUnitElement.prototype.draw = function (canvas) { };
-	    TimeUnitElement.prototype.onMouseMove = function () { };
-	    TimeUnitElement.prototype.onMouseOut = function () { };
-	    TimeUnitElement.prototype.isMouseOver = function (x, y) { };
+	    Object.defineProperty(TimeUnitElement.prototype, "width", {
+	        get: function () {
+	            return this.oneMinuteWidth * this.totalMinutes;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(TimeUnitElement.prototype, "x", {
+	        get: function () {
+	            var offset = this.startTime.totalMinutes() * this.oneMinuteWidth;
+	            // 1px is border
+	            return offset + 1;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(TimeUnitElement.prototype, "y", {
+	        get: function () {
+	            // 1px is border
+	            return 1;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    TimeUnitElement.prototype.draw = function (canvas) {
+	        canvas.fillStyle = this.color;
+	        canvas.fillRect(this.x, this.y, this.width, this.height);
+	    };
 	    return TimeUnitElement;
 	}());
+	//# sourceMappingURL=time-unit.js.map
+
+	var Tooltip = /** @class */ (function () {
+	    function Tooltip() {
+	        this.x = 0;
+	        this.y = 0;
+	        this.container = this.getOrCreateTooltipContainer("timeline-tooltip");
+	    }
+	    Tooltip.prototype.setPosition = function (x, y) {
+	        this.x = x;
+	        this.y = y;
+	        this.container.style.left = this.x + "px";
+	        this.container.style.top = this.y + "px";
+	    };
+	    Tooltip.prototype.show = function () {
+	        this.container.innerHTML = this.text;
+	        this.container.style.visibility = 'visible';
+	    };
+	    Tooltip.prototype.hide = function () {
+	        this.container.innerHTML = '';
+	        this.container.style.visibility = 'collapse';
+	    };
+	    Tooltip.prototype.getOrCreateTooltipContainer = function (id) {
+	        var containerElement = document.getElementById(id);
+	        if (containerElement) {
+	            return containerElement;
+	        }
+	        containerElement = document.createElement("div");
+	        containerElement.id = id;
+	        containerElement.style.width = 'auto';
+	        containerElement.style.height = 'auto';
+	        containerElement.style.position = "absolute";
+	        containerElement.style.border = '1px solid #ccc';
+	        containerElement.style.background = '#fff';
+	        containerElement.style.visibility = 'collapse';
+	        document.getElementsByTagName('body')[0].appendChild(containerElement);
+	        return containerElement;
+	    };
+	    return Tooltip;
+	}());
+	//# sourceMappingURL=tooltip.js.map
 
 	/**
 	 * Timeline Chart.
@@ -949,17 +1011,21 @@
 	        var _this = this;
 	        this.element = element;
 	        this.canvas = this.element.getContext("2d");
+	        this.tooltip = new Tooltip();
 	        this.config = new Config(config);
 	        // Set Without Border Px.
 	        this.width = this.element.width - 2;
 	        this.height = this.element.height - 2;
-	        this.oneMinutesWidth = this.width / (24 * 60);
-	        this.data = config.data.map(function (unit) {
+	        var oneMinuteWidth = this.width / (24 * 60);
+	        this.timeUnits = config.data.map(function (unit) {
 	            var startTime = _this.getTimeSpanFromString(unit.startTime);
 	            var endTime = _this.getTimeSpanFromString(unit.endTime);
-	            return new TimeUnitElement(startTime, endTime, unit.color);
+	            return new TimeUnitElement(_this.height, startTime, endTime, oneMinuteWidth, unit.color);
 	        });
 	        this.init();
+	        // Attach Events.
+	        this.element.addEventListener("mousemove", function (ev) { return _this.onMouseMove(_this, ev); }, false);
+	        this.element.addEventListener("mouseout", function (ev) { return _this.onMouseOut(_this, ev); }, false);
 	    }
 	    /**
 	     * Initialize
@@ -972,12 +1038,38 @@
 	     * Draw.
 	     */
 	    TimelineChart.prototype.draw = function () {
-	        // Draw.
-	        for (var _i = 0, _a = this.data; _i < _a.length; _i++) {
-	            var unit = _a[_i];
-	            this.canvas.fillStyle = unit.color;
-	            this.canvas.fillRect(unit.offset * this.oneMinutesWidth + 1, 1, unit.totalMinutes * this.oneMinutesWidth, this.height);
+	        for (var _i = 0, _a = this.timeUnits; _i < _a.length; _i++) {
+	            var timeUnit = _a[_i];
+	            timeUnit.draw(this.canvas);
 	        }
+	    };
+	    // #region Private Functions.
+	    TimelineChart.prototype.onMouseMove = function (sender, event) {
+	        var rect = this.element.getBoundingClientRect();
+	        var x = event.clientX - rect.left;
+	        var y = event.clientY - rect.top;
+	        var padLeft = function (text, padChar, size) {
+	            return (String(padChar).repeat(size) + (text)).substr((size * -1), size);
+	        };
+	        var defaultTemplate = function (timeUnit) {
+	            return "\u958B\u59CB\u6642\u9593: " + padLeft('' + timeUnit.startTime.hours, '0', 2) + ":" + padLeft('' + timeUnit.startTime.minutes, '0', 2) + " <br>\n              \u7D42\u4E86\u6642\u9593: " + padLeft('' + timeUnit.endTime.hours, '0', 2) + ":" + padLeft('' + timeUnit.endTime.minutes, '0', 2);
+	        };
+	        for (var _i = 0, _a = this.timeUnits; _i < _a.length; _i++) {
+	            var timeUnit = _a[_i];
+	            // ignore y axis.
+	            // always y axis height is 100%.
+	            if (timeUnit.x < x && timeUnit.x + timeUnit.width > x) {
+	                console.log(this.config.tooltip);
+	                this.tooltip.setPosition(event.clientX, event.clientY - 50);
+	                this.tooltip.text = this.config.tooltip != null ? this.config.tooltip(timeUnit) : defaultTemplate(timeUnit);
+	                this.tooltip.show();
+	            }
+	        }
+	    };
+	    TimelineChart.prototype.onMouseOut = function (sender, event) {
+	        this.tooltip.hide();
+	        // redraw.
+	        sender.draw();
 	    };
 	    /**
 	     * Draw Border.
@@ -987,7 +1079,7 @@
 	        this.canvas.strokeRect(0, 0, this.element.width, this.element.height);
 	    };
 	    /**
-	     * Draw Background
+	     * Draw Background.
 	     */
 	    TimelineChart.prototype.drawBackground = function () {
 	        this.canvas.fillStyle = this.config.backgroundColor;
