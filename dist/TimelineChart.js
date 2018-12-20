@@ -915,7 +915,13 @@
 	 * Time Unit Element.
 	 */
 	var TimeUnitElement = /** @class */ (function () {
-	    function TimeUnitElement(height, startTime, endTime, oneMinuteWidth, color) {
+	    function TimeUnitElement(height, startTime, endTime, oneMinuteWidth, color, label) {
+	        this.height = height;
+	        this.startTime = startTime;
+	        this.endTime = endTime;
+	        this.oneMinuteWidth = oneMinuteWidth;
+	        this.color = color;
+	        this.label = label;
 	        this.height = height;
 	        this.startTime = startTime;
 	        this.endTime = endTime;
@@ -959,7 +965,6 @@
 	    };
 	    return TimeUnitElement;
 	}());
-	//# sourceMappingURL=time-unit.js.map
 
 	var Tooltip = /** @class */ (function () {
 	    function Tooltip() {
@@ -994,6 +999,7 @@
 	        containerElement.style.border = '1px solid #ccc';
 	        containerElement.style.background = '#fff';
 	        containerElement.style.visibility = 'collapse';
+	        containerElement.style.padding = '5px';
 	        document.getElementsByTagName('body')[0].appendChild(containerElement);
 	        return containerElement;
 	    };
@@ -1020,7 +1026,7 @@
 	        this.timeUnits = config.data.map(function (unit) {
 	            var startTime = _this.getTimeSpanFromString(unit.startTime);
 	            var endTime = _this.getTimeSpanFromString(unit.endTime);
-	            return new TimeUnitElement(_this.height, startTime, endTime, oneMinuteWidth, unit.color);
+	            return new TimeUnitElement(_this.height, startTime, endTime, oneMinuteWidth, unit.color, unit.label);
 	        });
 	        this.init();
 	        // Attach Events.
@@ -1052,14 +1058,13 @@
 	            return (String(padChar).repeat(size) + (text)).substr((size * -1), size);
 	        };
 	        var defaultTemplate = function (timeUnit) {
-	            return "\u958B\u59CB\u6642\u9593: " + padLeft('' + timeUnit.startTime.hours, '0', 2) + ":" + padLeft('' + timeUnit.startTime.minutes, '0', 2) + " <br>\n              \u7D42\u4E86\u6642\u9593: " + padLeft('' + timeUnit.endTime.hours, '0', 2) + ":" + padLeft('' + timeUnit.endTime.minutes, '0', 2);
+	            return "\u958B\u59CB\u6642\u9593: " + padLeft('' + timeUnit.startTime.hours, '0', 2) + ":" + padLeft('' + timeUnit.startTime.minutes, '0', 2) + " <br>\n              \u7D42\u4E86\u6642\u9593: " + padLeft('' + timeUnit.endTime.hours, '0', 2) + ":" + padLeft('' + timeUnit.endTime.minutes, '0', 2) + " <br>\n              \u30B9\u30C6\u30FC\u30BF\u30B9: " + timeUnit.label;
 	        };
 	        for (var _i = 0, _a = this.timeUnits; _i < _a.length; _i++) {
 	            var timeUnit = _a[_i];
 	            // ignore y axis.
 	            // always y axis height is 100%.
 	            if (timeUnit.x < x && timeUnit.x + timeUnit.width > x) {
-	                console.log(this.config.tooltip);
 	                this.tooltip.setPosition(event.clientX, event.clientY - 50);
 	                this.tooltip.text = this.config.tooltip != null ? this.config.tooltip(timeUnit) : defaultTemplate(timeUnit);
 	                this.tooltip.show();
@@ -1068,8 +1073,6 @@
 	    };
 	    TimelineChart.prototype.onMouseOut = function (sender, event) {
 	        this.tooltip.hide();
-	        // redraw.
-	        sender.draw();
 	    };
 	    /**
 	     * Draw Border.
@@ -1099,6 +1102,7 @@
 	    };
 	    return TimelineChart;
 	}());
+	//# sourceMappingURL=timeline-chart.js.map
 
 	return TimelineChart;
 

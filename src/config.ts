@@ -24,4 +24,5 @@ class TimeUnitConfig {
     public startTime: string
     public endTime: string
     public color: string
+    public label: string
 }

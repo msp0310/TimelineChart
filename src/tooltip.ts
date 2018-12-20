@@ -39,6 +39,7 @@ export default class Tooltip {
     containerElement.style.border = '1px solid #ccc'
     containerElement.style.background = '#fff'
     containerElement.style.visibility = 'collapse'
+    containerElement.style.padding = '5px'
     document.getElementsByTagName('body')[0].appendChild(containerElement)
     return containerElement
   }

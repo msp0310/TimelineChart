@@ -35,7 +35,8 @@ export default class TimelineChart {
         startTime,
         endTime,
         oneMinuteWidth,
-        unit.color
+        unit.color,
+        unit.label
       )
     })
 
@@ -81,13 +82,13 @@ export default class TimelineChart {
     }
     const defaultTemplate = (timeUnit: TimeUnitElement):string => {
       return `開始時間: ${padLeft('' + timeUnit.startTime.hours, '0', 2)}:${padLeft('' + timeUnit.startTime.minutes, '0', 2)} <br>
-              終了時間: ${padLeft('' + timeUnit.endTime.hours, '0', 2)}:${padLeft('' + timeUnit.endTime.minutes, '0', 2)}`
+              終了時間: ${padLeft('' + timeUnit.endTime.hours, '0', 2)}:${padLeft('' + timeUnit.endTime.minutes, '0', 2)} <br>
+              ステータス: ${timeUnit.label}`
     }
     for (let timeUnit of this.timeUnits) {
       // ignore y axis.
       // always y axis height is 100%.
       if (timeUnit.x < x && timeUnit.x + timeUnit.width > x) {
-        console.log(this.config.tooltip)
         this.tooltip.setPosition(event.clientX, event.clientY - 50)
         this.tooltip.text = this.config.tooltip != null ? this.config.tooltip(timeUnit) : defaultTemplate(timeUnit)
         this.tooltip.show()
@@ -97,8 +98,6 @@ export default class TimelineChart {
 
   private onMouseOut(sender: TimelineChart, event: MouseEvent) {
     this.tooltip.hide()
-    // redraw.
-    sender.draw()
   }
 
   /**

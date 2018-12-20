@@ -4,18 +4,14 @@ import { TimeSpan } from "timespan"
  * Time Unit Element.
  */
 export default class TimeUnitElement {
-  public height: number
-  public startTime: TimeSpan
-  public endTime: TimeSpan
-  public color: string
-  public oneMinuteWidth: number
 
   constructor(
-    height: number,
-    startTime: TimeSpan,
-    endTime: TimeSpan,
-    oneMinuteWidth: number,
-    color: string
+    public height: number,
+    public startTime: TimeSpan,
+    public endTime: TimeSpan,
+    public oneMinuteWidth: number,
+    public color: string,
+    public label: string
   ) {
     this.height = height
     this.startTime = startTime
