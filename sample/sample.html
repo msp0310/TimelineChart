@@ -2,34 +2,72 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Sample</title>
-    <script src="../dist/TimelineChart.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Sample</title>
+  <script src="../dist/TimelineChart.js"></script>
 </head>
 
 <body>
-    <h1>Sample</h1>
+  <h1>Sample</h1>
 
-    <canvas id="chart" width="500" height="50"></canvas>
-    <script>
-        var chart = new TimelineChart(document.getElementById('chart'), {
-            borderColor: 'gray',
-            data: [{
-                startTime: '00:00',
-                endTime: '01:00',
-                color: 'green',
-                label: '正常'
-            }, {
-                startTime: '01:00',
-                endTime: '02:00',
-                color: 'red',
-                label: '異常停止'
-            }]
-        });
-        chart.draw();
-    </script>
+  <canvas id="chart" width="500" height="50" style="border: 1px solid #333;"></canvas>
+  <script>
+    var chart = new TimelineChart(document.getElementById('chart'), {
+      config: {
+        borderColor: 'rgba(0,0,0,1.0)',
+        backgroundColor: 'rgba(255,255,255,0.0)',
+        layout: {
+          padding: {
+            left: 15,
+            top: 15,
+            right: 15,
+            bottom: 15
+          }
+        }
+      },
+      data: [{
+        "startTime": "00:00",
+        "endTime": "06:59",
+        "color": "rgba(255,0,0,1.0)",
+        "label": "計画停止"
+      }, {
+        "startTime": "07:00",
+        "endTime": "11:59",
+        "color": "rgba(0,255,0,1.0)",
+        "label": "正常"
+      }, {
+        "startTime": "12:00",
+        "endTime": "13:00",
+        "color": "rgba(255,0,0,1.0)",
+        "label": "計画停止"
+      }, {
+        "startTime": "15:30",
+        "endTime": "15:59",
+        "color": "rgba(0,255,0,1.0)",
+        "label": "正常"
+      }, {
+        "startTime": "15:30",
+        "endTime": "15:59",
+        "color": "rgba(255,0,0,1.0)",
+        "label": "異常停止"
+      }, {
+        "startTime": "15:31",
+        "endTime": "17:59",
+        "color": "rgba(0,255,0,1.0)",
+        "label": "正常"
+      }, {
+        "startTime": "18:00",
+        "endTime": "23:59",
+        "color": "rgba(255,0,0,1.0)",
+        "label": "計画停止"
+      }]
+    });
+
+    chart.draw();
+
+  </script>
 </body>
 
 </html>

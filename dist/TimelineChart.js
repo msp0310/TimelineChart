@@ -1,7 +1,7 @@
 /*!
  * Timeline.js v0.1.1
  *
- * (c) 2018 Sawada Makoto.
+ * (c) 2019 Sawada Makoto.
  * Released under the MIT License
  */
 (function (global, factory) {
@@ -898,6 +898,30 @@
 	var timeSpan_12 = timeSpan.clone;
 
 	/**
+	 * Layout.
+	 */
+	var LayoutConfig = /** @class */ (function () {
+	    function LayoutConfig(layout) {
+	        this.padding = (layout.padding != null ? layout.padding : new PaddingConfig(0, 0, 0, 0));
+	    }
+	    return LayoutConfig;
+	}());
+	var PaddingConfig = /** @class */ (function () {
+	    function PaddingConfig(left, top, right, bottom) {
+	        if (left === void 0) { left = 0; }
+	        if (top === void 0) { top = 0; }
+	        if (right === void 0) { right = 0; }
+	        if (bottom === void 0) { bottom = 0; }
+	        this.left = left;
+	        this.top = top;
+	        this.right = right;
+	        this.bottom = bottom;
+	    }
+	    return PaddingConfig;
+	}());
+	//# sourceMappingURL=config-layout.js.map
+
+	/**
 	 * Config.
 	 */
 	var Config = /** @class */ (function () {
@@ -906,6 +930,7 @@
 	        this.backgroundColor = config.backgroundColor || '#fff';
 	        this.data = config.data;
 	        this.tooltip = config.tooltip;
+	        this.layout = new LayoutConfig(config.layout != null ? config.layout : {});
 	    }
 	    return Config;
 	}());
@@ -915,13 +940,14 @@
 	 * Time Unit Element.
 	 */
 	var TimeUnitElement = /** @class */ (function () {
-	    function TimeUnitElement(height, startTime, endTime, oneMinuteWidth, color, label) {
+	    function TimeUnitElement(height, startTime, endTime, oneMinuteWidth, color, label, config) {
 	        this.height = height;
 	        this.startTime = startTime;
 	        this.endTime = endTime;
 	        this.oneMinuteWidth = oneMinuteWidth;
 	        this.color = color;
 	        this.label = label;
+	        this.config = config;
 	        this.height = height;
 	        this.startTime = startTime;
 	        this.endTime = endTime;
@@ -946,7 +972,7 @@
 	        get: function () {
 	            var offset = this.startTime.totalMinutes() * this.oneMinuteWidth;
 	            // 1px is border
-	            return offset + 1;
+	            return (offset + 1) + this.config.layout.padding.left;
 	        },
 	        enumerable: true,
 	        configurable: true
@@ -954,7 +980,7 @@
 	    Object.defineProperty(TimeUnitElement.prototype, "y", {
 	        get: function () {
 	            // 1px is border
-	            return 1;
+	            return 1 + this.config.layout.padding.top;
 	        },
 	        enumerable: true,
 	        configurable: true
@@ -1013,20 +1039,20 @@
 	 * (C) Sawada Makoto | MIT License
 	 */
 	var TimelineChart = /** @class */ (function () {
-	    function TimelineChart(element, config) {
+	    function TimelineChart(element, obj) {
 	        var _this = this;
 	        this.element = element;
 	        this.canvas = this.element.getContext("2d");
 	        this.tooltip = new Tooltip();
-	        this.config = new Config(config);
+	        this.config = new Config(obj.config);
 	        // Set Without Border Px.
-	        this.width = this.element.width - 2;
-	        this.height = this.element.height - 2;
+	        this.width = (this.element.width - 2) - (this.config.layout.padding.left + this.config.layout.padding.right);
+	        this.height = this.element.height - 2 - (this.config.layout.padding.top + this.config.layout.padding.bottom);
 	        var oneMinuteWidth = this.width / (24 * 60);
-	        this.timeUnits = config.data.map(function (unit) {
+	        this.timeUnits = obj.data.map(function (unit) {
 	            var startTime = _this.getTimeSpanFromString(unit.startTime);
 	            var endTime = _this.getTimeSpanFromString(unit.endTime);
-	            return new TimeUnitElement(_this.height, startTime, endTime, oneMinuteWidth, unit.color, unit.label);
+	            return new TimeUnitElement(_this.height, startTime, endTime, oneMinuteWidth, unit.color, unit.label, _this.config);
 	        });
 	        this.init();
 	        // Attach Events.
@@ -1079,14 +1105,16 @@
 	     */
 	    TimelineChart.prototype.drawBorder = function () {
 	        this.canvas.strokeStyle = this.config.borderColor;
-	        this.canvas.strokeRect(0, 0, this.element.width, this.element.height);
+	        var paddingX = this.config.layout.padding.top + this.config.layout.padding.bottom;
+	        var paddingY = this.config.layout.padding.left + this.config.layout.padding.right;
+	        this.canvas.strokeRect(this.config.layout.padding.left, this.config.layout.padding.top, this.element.width - paddingY, this.element.height - paddingX);
 	    };
 	    /**
 	     * Draw Background.
 	     */
 	    TimelineChart.prototype.drawBackground = function () {
 	        this.canvas.fillStyle = this.config.backgroundColor;
-	        this.canvas.fillRect(1, 1, this.width, this.height);
+	        this.canvas.fillRect(this.config.layout.padding.left + 1, this.config.layout.padding.top + 1, this.width, this.height);
 	    };
 	    /**
 	     * Parse Time String.

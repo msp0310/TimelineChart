@@ -17,17 +17,17 @@ export default class TimelineChart {
   public timeUnits: TimeUnitElement[]
   public tooltip: Tooltip
 
-  constructor(element: HTMLCanvasElement, config: any) {
+  constructor(element: HTMLCanvasElement, obj: any) {
     this.element = element
     this.canvas = this.element.getContext("2d")
     this.tooltip = new Tooltip()
-    this.config = new Config(config)
+    this.config = new Config(obj.config)
 
     // Set Without Border Px.
-    this.width = this.element.width - 2
-    this.height = this.element.height - 2
+    this.width = (this.element.width - 2) - (this.config.layout.padding.left + this.config.layout.padding.right)
+    this.height = this.element.height - 2- (this.config.layout.padding.top + this.config.layout.padding.bottom)
     const oneMinuteWidth = this.width / (24 * 60)
-    this.timeUnits = config.data.map(unit => {
+    this.timeUnits = obj.data.map(unit => {
       const startTime = this.getTimeSpanFromString(unit.startTime)
       const endTime = this.getTimeSpanFromString(unit.endTime)
       return new TimeUnitElement(
@@ -36,7 +36,8 @@ export default class TimelineChart {
         endTime,
         oneMinuteWidth,
         unit.color,
-        unit.label
+        unit.label,
+        this.config
       )
     })
 
@@ -105,7 +106,9 @@ export default class TimelineChart {
    */
   private drawBorder() {
     this.canvas.strokeStyle = this.config.borderColor
-    this.canvas.strokeRect(0, 0, this.element.width, this.element.height)
+    const paddingX = this.config.layout.padding.top + this.config.layout.padding.bottom
+    const paddingY = this.config.layout.padding.left + this.config.layout.padding.right
+    this.canvas.strokeRect(this.config.layout.padding.left, this.config.layout.padding.top, this.element.width - paddingY, this.element.height - paddingX)
   }
 
   /**
@@ -113,7 +116,7 @@ export default class TimelineChart {
    */
   private drawBackground() {
     this.canvas.fillStyle = this.config.backgroundColor
-    this.canvas.fillRect(1, 1, this.width, this.height)
+    this.canvas.fillRect(this.config.layout.padding.left + 1, this.config.layout.padding.top + 1, this.width, this.height)
   }
 
   /**
