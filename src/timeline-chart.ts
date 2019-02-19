@@ -1,14 +1,8 @@
 import { TimeSpan } from "timespan";
-<<<<<<< Updated upstream
-import Config from "./config";
-import TimeUnitElement from "./time-unit";
-import Tooltip from "./tooltip";
-=======
 import Config from "./config/config";
 import TimeUnitElement from "./time-unit";
 import Tooltip from "./tooltip";
-import TimeSpanParser from "./util/timespan";
->>>>>>> Stashed changes
+import TimeSpanParser from "./util/TimeSpanParser";
 
 /**
  * Timeline Chart.
@@ -39,24 +33,6 @@ export default class TimelineChart {
       this.element.height -
       2 -
       (this.config.layout.padding.top + this.config.layout.padding.bottom);
-<<<<<<< Updated upstream
-    const oneMinuteWidth = this.width / (24 * 60);
-    this.timeUnits = obj.data.map(unit => {
-      const startTime = this.getTimeSpanFromString(unit.startTime);
-      const endTime = this.getTimeSpanFromString(unit.endTime);
-      return new TimeUnitElement(
-        this.height,
-        startTime,
-        endTime,
-        oneMinuteWidth,
-        unit.color,
-        unit.label,
-        this.config
-      );
-    });
-
-=======
-
     // one minute width.
     const oneMinuteWidth = this.width / (24 * 60);
     // generate time units.
@@ -73,7 +49,6 @@ export default class TimelineChart {
         )
     );
 
->>>>>>> Stashed changes
     this.init();
 
     // Attach Events.
@@ -173,23 +148,6 @@ export default class TimelineChart {
       this.width,
       this.height
     );
-<<<<<<< Updated upstream
-  }
-
-  /**
-   * Parse Time String.
-   * @param {string} time time ex) "00:00"
-   * @returns {TimeSpan} timespan
-   */
-  private getTimeSpanFromString(time: string): TimeSpan {
-    const timeArray: string[] = time.split(":");
-    const timeSpan = new TimeSpan();
-    timeSpan.addHours(parseInt(timeArray[0]));
-    timeSpan.addMinutes(parseInt(timeArray[1]));
-
-    return timeSpan;
-=======
->>>>>>> Stashed changes
   }
   // #endregion
 }
