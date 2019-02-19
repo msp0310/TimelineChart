@@ -1,5 +1,5 @@
 import { TimeSpan } from "timespan";
-import Config from './config';
+import Config from "./config";
 
 /**
  * Time Unit Element.
@@ -30,9 +30,11 @@ export default class TimeUnitElement {
   }
 
   public get x(): number {
-    const offset = this.startTime.totalMinutes() * this.oneMinuteWidth;
+    const offset =
+      this.startTime.totalMinutes() * this.oneMinuteWidth -
+      this.config.offset.totalMinutes() * this.oneMinuteWidth;
     // 1px is border
-    return (offset + 1) + this.config.layout.padding.left;
+    return offset > 0 ? offset + 1 + this.config.layout.padding.left : 0;
   }
 
   public get y(): number {

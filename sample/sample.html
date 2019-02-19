@@ -18,17 +18,10 @@
       config: {
         borderColor: 'rgba(0,0,0,1.0)',
         backgroundColor: 'rgba(255,255,255,0.0)',
-        layout: {
-          padding: {
-            left: 15,
-            top: 15,
-            right: 15,
-            bottom: 15
-          }
-        }
+        timeOffset: "06:00"
       },
       data: [{
-        "startTime": "00:00",
+        "startTime": "06:00",
         "endTime": "06:59",
         "color": "rgba(255,0,0,1.0)",
         "label": "計画停止"
@@ -42,29 +35,9 @@
         "endTime": "13:00",
         "color": "rgba(255,0,0,1.0)",
         "label": "計画停止"
-      }, {
-        "startTime": "15:30",
-        "endTime": "15:59",
-        "color": "rgba(0,255,0,1.0)",
-        "label": "正常"
-      }, {
-        "startTime": "15:30",
-        "endTime": "15:59",
-        "color": "rgba(255,0,0,1.0)",
-        "label": "異常停止"
-      }, {
-        "startTime": "15:31",
-        "endTime": "17:59",
-        "color": "rgba(0,255,0,1.0)",
-        "label": "正常"
-      }, {
-        "startTime": "18:00",
-        "endTime": "23:59",
-        "color": "rgba(255,0,0,1.0)",
-        "label": "計画停止"
       }]
     });
-
+    console.log(chart)
     chart.draw();
 
   </script>
