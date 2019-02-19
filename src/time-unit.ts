@@ -1,5 +1,9 @@
 import { TimeSpan } from "timespan";
-import Config from './config';
+<<<<<<< Updated upstream
+import Config from "./config";
+=======
+import Config from "./config/config";
+>>>>>>> Stashed changes
 
 /**
  * Time Unit Element.
@@ -14,10 +18,6 @@ export default class TimeUnitElement {
     public label: string,
     public config: Config
   ) {
-    this.height = height;
-    this.startTime = startTime;
-    this.endTime = endTime;
-    this.oneMinuteWidth = oneMinuteWidth;
     this.color = color || "#fff";
   }
 
@@ -30,9 +30,15 @@ export default class TimeUnitElement {
   }
 
   public get x(): number {
-    const offset = this.startTime.totalMinutes() * this.oneMinuteWidth;
+    const offset =
+      this.config.offset.totalMinutes() -
+      this.startTime.totalMinutes() * this.oneMinuteWidth;
     // 1px is border
-    return (offset + 1) + this.config.layout.padding.left;
+<<<<<<< Updated upstream
+    return offset + 1 + this.config.layout.padding.left;
+=======
+    return offset > 0 ? offset + 1 + this.config.layout.padding.left : 0;
+>>>>>>> Stashed changes
   }
 
   public get y(): number {
