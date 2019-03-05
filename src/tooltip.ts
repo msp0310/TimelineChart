@@ -11,17 +11,23 @@ export default class Tooltip {
   public setPosition(x: number, y: number) {
     this.x = x;
     this.y = y;
-    this.container.style.left = this.x + "px";
-    this.container.style.top = this.y + "px";
+
+    const margin = 15;
+    this.container.style.left = this.x - (this.container.offsetWidth / 2) + "px";
+    this.container.style.top = (this.y - (this.container.offsetHeight + margin) + "px");
   }
 
   public show(): void {
-    this.container.innerHTML = this.text;
+    if (this.container.innerHTML !== this.text) {
+      this.container.innerHTML = this.text;
+    }
     this.container.style.visibility = "visible";
   }
 
   public hide(): void {
-    this.container.innerHTML = "";
+    if (!this.container.innerHTML) {
+      this.container.innerHTML = "";
+    }
     this.container.style.visibility = "collapse";
   }
 
@@ -40,6 +46,7 @@ export default class Tooltip {
     containerElement.style.background = "#fff";
     containerElement.style.visibility = "collapse";
     containerElement.style.padding = "5px";
+    containerElement.style.zIndex = '99999';
     document.getElementsByTagName("body")[0].appendChild(containerElement);
     return containerElement;
   }

@@ -1,4 +1,3 @@
-import { TimeSpan } from "timespan";
 import Config from "./config/config";
 import TimeUnitElement from "./time-unit";
 import Tooltip from "./tooltip";
@@ -18,6 +17,10 @@ export default class TimelineChart {
   public timeUnits: TimeUnitElement[];
   public tooltip: Tooltip;
 
+  public get oneMinuteWidth(): number {
+    return this.width / (24 * 60);
+  }
+
   constructor(element: HTMLCanvasElement, obj: any) {
     this.element = element;
     this.canvas = this.element.getContext("2d");
@@ -27,25 +30,19 @@ export default class TimelineChart {
     // Set Without Border Px.
     this.width =
       this.element.width -
-      2 -
+      this.config.borderWidth -
       (this.config.layout.padding.left + this.config.layout.padding.right);
-    this.height =
-      this.element.height -
-      2 -
-      (this.config.layout.padding.top + this.config.layout.padding.bottom);
-    // one minute width.
-    const oneMinuteWidth = this.width / (24 * 60);
+    this.height = this.element.height;
+
     // generate time units.
     this.timeUnits = obj.data.map(
       unit =>
         new TimeUnitElement(
-          this.height,
           TimeSpanParser.parse(unit.startTime),
           TimeSpanParser.parse(unit.endTime),
-          oneMinuteWidth,
+          this.oneMinuteWidth,
           unit.color,
-          unit.label,
-          this.config
+          unit.label
         )
     );
 
@@ -68,16 +65,32 @@ export default class TimelineChart {
    * Initialize
    */
   private init() {
-    this.drawBorder();
     this.drawBackground();
+    this.drawBorder();
   }
 
   /**
    * Draw.
    */
   public draw(): void {
+    const timeOffset = this.config.offset.totalMinutes() * this.oneMinuteWidth;
+    const padding = this.config.layout.padding;
+    const borderWidth = this.config.borderWidth;
+
+    // Draw Time Units
     for (let timeUnit of this.timeUnits) {
-      timeUnit.draw(this.canvas);
+      const offset =
+        timeUnit.startTime.totalMinutes() * this.oneMinuteWidth +
+        borderWidth -
+        timeOffset +
+        padding.left;
+      const isNegativeOffset = offset < 0;
+      const x = !isNegativeOffset ? offset : 0;
+      const y = borderWidth + padding.top;
+      const height = this.height - (borderWidth * 2 + (padding.top + padding.bottom));
+      const width = !isNegativeOffset ? timeUnit.width : timeUnit.width + offset;
+      this.canvas.fillStyle = timeUnit.color;
+      this.canvas.fillRect(x, y, width, height);
     }
   }
 
@@ -86,34 +99,34 @@ export default class TimelineChart {
     const rect = this.element.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
-    const padLeft = (text: string, padChar: string, size: number): string => {
-      return (String(padChar).repeat(size) + text).substr(size * -1, size);
-    };
-    const defaultTemplate = (timeUnit: TimeUnitElement): string => {
-      return `開始時間: ${padLeft(
-        "" + timeUnit.startTime.hours,
-        "0",
-        2
-      )}:${padLeft("" + timeUnit.startTime.minutes, "0", 2)} <br>
-              終了時間: ${padLeft(
-                "" + timeUnit.endTime.hours,
-                "0",
-                2
-              )}:${padLeft("" + timeUnit.endTime.minutes, "0", 2)} <br>
-              ステータス: ${timeUnit.label}`;
-    };
-    for (let timeUnit of this.timeUnits) {
-      // ignore y axis.
-      // always y axis height is 100%.
-      if (timeUnit.x < x && timeUnit.x + timeUnit.width > x) {
-        this.tooltip.setPosition(event.clientX, event.clientY - 50);
-        this.tooltip.text =
-          this.config.tooltip != null
-            ? this.config.tooltip(timeUnit)
-            : defaultTemplate(timeUnit);
-        this.tooltip.show();
-      }
+    const padding = this.config.layout.padding
+    const shouldShowTooltip = this.config.tooltip != null;
+
+    if (!shouldShowTooltip) {
+      return;
     }
+
+    // パディング範囲は無視
+    // left, right, top, bottom 
+    if (x < padding.left
+      || x > (this.width - padding.right)
+      || y < padding.top
+      || y > (this.height - padding.bottom)) {
+      this.tooltip.hide()
+      return;
+    }
+
+    let offset = padding.left
+    for (let unit of this.timeUnits) {
+      if (x >= offset && x <= (offset + unit.width)) {
+        this.tooltip.setPosition(event.clientX, event.clientY)
+        this.tooltip.text = this.config.tooltip(unit)
+        this.tooltip.show()
+        return
+      }
+      offset += unit.width
+    }
+    this.tooltip.hide()
   }
 
   private onMouseOut(sender: TimelineChart, event: MouseEvent) {
@@ -124,14 +137,20 @@ export default class TimelineChart {
    * Draw Border.
    */
   private drawBorder() {
+    if (this.config.borderWidth <= 0) {
+      return;
+    }
+
+    const padding = this.config.layout.padding;
+    const paddingX = padding.top + padding.bottom;
+    const paddingY = padding.left + padding.right;
+
+    // top and bottom
     this.canvas.strokeStyle = this.config.borderColor;
-    const paddingX =
-      this.config.layout.padding.top + this.config.layout.padding.bottom;
-    const paddingY =
-      this.config.layout.padding.left + this.config.layout.padding.right;
+    this.canvas.lineWidth = this.config.borderWidth * 2;
     this.canvas.strokeRect(
-      this.config.layout.padding.left,
-      this.config.layout.padding.top,
+      padding.left,
+      padding.top,
       this.element.width - paddingY,
       this.element.height - paddingX
     );
@@ -141,12 +160,15 @@ export default class TimelineChart {
    * Draw Background.
    */
   private drawBackground() {
+    const padding = this.config.layout.padding;
+    const paddingX = padding.top + padding.bottom;
+
     this.canvas.fillStyle = this.config.backgroundColor;
     this.canvas.fillRect(
-      this.config.layout.padding.left + 1,
-      this.config.layout.padding.top + 1,
+      this.config.layout.padding.left,
+      this.config.layout.padding.top,
       this.width,
-      this.height
+      this.height - paddingX
     );
   }
   // #endregion
