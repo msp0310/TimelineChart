@@ -5,37 +5,72 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Sample</title>
+  <title>Timeline Chart</title>
   <script src="../dist/TimelineChart.js"></script>
+  <style>
+    #data {
+      border: 1px solid #ccc;
+      background-color: #fff;
+      width: 1000px;
+      padding: 15px;
+      box-sizing: border-box;
+    }
+
+  </style>
 </head>
 
-<body>
-  <h1>Sample</h1>
+<body style="background-color: whitesmoke">
+  <h1>Timeline Chart</h1>
 
-  <canvas id="chart" width="500" height="50" style="border: 1px solid #333;"></canvas>
+  <h2>Chart</h2>
+  <canvas id="chart" width="1000" height="100" style="border: 1px #333 solid"></canvas>
+
+  <h2>Data</h2>
+  <pre id="data"></pre>
+
   <script>
-    var chart = new TimelineChart(document.getElementById('chart'), {
+    const data = [{
+      "startTime": "06:00",
+      "endTime": "06:59",
+      "color": "rgba(255,0,0,1.0)",
+      "label": "計画停止"
+    }, {
+      "startTime": "07:00",
+      "endTime": "11:59",
+      "color": "rgba(0,255,0,1.0)",
+      "label": "正常"
+    }, {
+      "startTime": "12:00",
+      "endTime": "13:00",
+      "color": "rgba(255,0,0,1.0)",
+      "label": "計画停止"
+    }]
+
+    // output 
+    document.getElementById('data').innerText = JSON.stringify(data, null, 2);
+
+    // draw chart.
+    const chart = new TimelineChart(document.getElementById('chart'), {
       config: {
-        borderColor: 'rgba(0,0,0,1.0)',
-        backgroundColor: 'rgba(255,255,255,0.0)',
-        timeOffset: "06:00"
+        borderColor: '#ccc',
+        borderWidth: 1,
+        backgroundColor: 'white',
+        timeOffset: "06:00",
+        layout: {
+          padding: {
+            top: '20px',
+            left: '20px',
+            right: '20px',
+            bottom: '20px'
+          }
+        },
+        tooltip: function (unit) {
+          return `開始時間: ${unit.startTimeText}
+          <br>終了時間: ${unit.endTimeText}
+          <br>ラベル: ${unit.label}`
+        }
       },
-      data: [{
-        "startTime": "06:00",
-        "endTime": "06:59",
-        "color": "rgba(255,0,0,1.0)",
-        "label": "計画停止"
-      }, {
-        "startTime": "07:00",
-        "endTime": "11:59",
-        "color": "rgba(0,255,0,1.0)",
-        "label": "正常"
-      }, {
-        "startTime": "12:00",
-        "endTime": "13:00",
-        "color": "rgba(255,0,0,1.0)",
-        "label": "計画停止"
-      }]
+      data: data
     });
     console.log(chart)
     chart.draw();

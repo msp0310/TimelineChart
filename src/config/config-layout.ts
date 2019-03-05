@@ -5,17 +5,30 @@ export default class LayoutConfig {
   public padding: PaddingConfig;
 
   constructor(layout: any) {
-    this.padding = (layout.padding != null
-      ? layout.padding
-      : new PaddingConfig(0, 0, 0, 0)) as PaddingConfig;
+    const padding = (layout || {}).padding;
+    this.padding = new PaddingConfig(
+      padding.left,
+      padding.top,
+      padding.right,
+      padding.bottom
+    );
   }
 }
 
 export class PaddingConfig {
+  public left: number;
+  public top: number;
+  public right: number;
+  public bottom: number;
   constructor(
-    public left: number = 0,
-    public top: number = 0,
-    public right: number = 0,
-    public bottom: number = 0
-  ) {}
+    left: number | string = 0,
+    top: number | string = 0,
+    right: number | string = 0,
+    bottom: number | string = 0
+  ) {
+    this.left = typeof left == "string" ? parseInt(left || "0") : left;
+    this.top = typeof top == "string" ? parseInt(top || "0") : top;
+    this.right = typeof right == "string" ? parseInt(right || "0") : right;
+    this.bottom = typeof bottom == "string" ? parseInt(bottom || "0") : bottom;
+  }
 }

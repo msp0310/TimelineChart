@@ -1,49 +1,31 @@
 import { TimeSpan } from "timespan";
-import Config from "./config";
+import TimeSpanFormatter from './util/TimeSpanFormatter'
 
 /**
  * Time Unit Element.
  */
 export default class TimeUnitElement {
   constructor(
-    public height: number,
     public startTime: TimeSpan,
     public endTime: TimeSpan,
     public oneMinuteWidth: number,
-    public color: string,
-    public label: string,
-    public config: Config
-  ) {
-    this.height = height;
-    this.startTime = startTime;
-    this.endTime = endTime;
-    this.oneMinuteWidth = oneMinuteWidth;
-    this.color = color || "#fff";
-  }
+    public color: string = "#fff",
+    public label: string
+  ) { }
 
   public get totalMinutes(): number {
     return this.endTime.totalMinutes() - this.startTime.totalMinutes();
   }
 
+  public get startTimeText(): string {
+    return TimeSpanFormatter.format(this.startTime)
+  }
+
+  public get endTimeText(): string {
+    return TimeSpanFormatter.format(this.endTime)
+  }
+
   public get width(): number {
     return this.oneMinuteWidth * this.totalMinutes;
-  }
-
-  public get x(): number {
-    const offset =
-      this.startTime.totalMinutes() * this.oneMinuteWidth -
-      this.config.offset.totalMinutes() * this.oneMinuteWidth;
-    // 1px is border
-    return offset > 0 ? offset + 1 + this.config.layout.padding.left : 0;
-  }
-
-  public get y(): number {
-    // 1px is border
-    return 1 + this.config.layout.padding.top;
-  }
-
-  public draw(canvas: CanvasRenderingContext2D): void {
-    canvas.fillStyle = this.color;
-    canvas.fillRect(this.x, this.y, this.width, this.height);
   }
 }
