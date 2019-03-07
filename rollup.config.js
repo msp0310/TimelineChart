@@ -5,14 +5,14 @@ import typescript from 'rollup-plugin-typescript'
 import pkg from './package.json'
 
 const banner = `/*!
- * Timeline.js v${pkg.version}
+ * Timeline.js v${pkg.version }
  *
- * (c) ${new Date().getFullYear()} Sawada Makoto.
+ * (c) ${new Date().getFullYear() } Sawada Makoto.
  * Released under the MIT License
  */`;
 
 export default {
-  entry: 'src/timeline-chart.ts',
+  entry: 'src/TimelineChart.ts',
   dest: 'dist/TimelineChart.js',
   format: 'umd',
   moduleName: 'TimelineChart',

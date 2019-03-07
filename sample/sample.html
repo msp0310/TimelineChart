@@ -15,7 +15,6 @@
       padding: 15px;
       box-sizing: border-box;
     }
-
   </style>
 </head>
 
@@ -23,7 +22,7 @@
   <h1>Timeline Chart</h1>
 
   <h2>Chart</h2>
-  <canvas id="chart" width="1000" height="100" style="border: 1px #333 solid"></canvas>
+  <canvas id="chart" width="1000" height="50"></canvas>
 
   <h2>Data</h2>
   <pre id="data"></pre>
@@ -31,12 +30,12 @@
   <script>
     const data = [{
       "startTime": "06:00",
-      "endTime": "06:59",
+      "endTime": "07:00",
       "color": "rgba(255,0,0,1.0)",
       "label": "計画停止"
     }, {
       "startTime": "07:00",
-      "endTime": "11:59",
+      "endTime": "12:00",
       "color": "rgba(0,255,0,1.0)",
       "label": "正常"
     }, {
@@ -44,30 +43,42 @@
       "endTime": "13:00",
       "color": "rgba(255,0,0,1.0)",
       "label": "計画停止"
+    }, {
+      "startTime": "17:00",
+      "endTime": "18:00",
+      "color": "rgba(255,0,0,1.0)",
+      "label": "計画停止BBBBBBB"
     }]
 
-    // output 
+    // output
     document.getElementById('data').innerText = JSON.stringify(data, null, 2);
 
     // draw chart.
     const chart = new TimelineChart(document.getElementById('chart'), {
       config: {
-        borderColor: '#ccc',
+        time: {
+          start: "06:00",
+          end: "24:00"
+        },
         borderWidth: 1,
         backgroundColor: 'white',
-        timeOffset: "06:00",
         layout: {
           padding: {
-            top: '20px',
-            left: '20px',
-            right: '20px',
-            bottom: '20px'
-          }
+            top: '0px',
+            left: '0px',
+            right: '0px',
+            bottom: '0px'
+          },
+        },
+        label: {
+          showLabel: true,
+          fontFamily: 'メイリオ',
+          fontSize: '12px',
         },
         tooltip: function (unit) {
-          return `開始時間: ${unit.startTimeText}
-          <br>終了時間: ${unit.endTimeText}
-          <br>ラベル: ${unit.label}`
+          return `開始時間: ${ unit.startTimeText }
+          <br>終了時間: ${unit.endTimeText }
+          <br>ラベル: ${unit.label }`
         }
       },
       data: data

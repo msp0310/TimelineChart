@@ -11,7 +11,7 @@
   "author": "Sawada Makoto",
   "license": "MIT",
   "dependencies": {
-    "timespan": "^2.3.0"
+    "typescript-dotnet-es6": "^4.11.2"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
