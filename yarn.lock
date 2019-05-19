@@ -2051,10 +2051,6 @@ tar@^4:
     safe-buffer "^5.1.2"
     yallist "^3.0.2"
 
-timespan@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/timespan/-/timespan-2.3.0.tgz#4902ce040bd13d845c8f59b27e9d59bad6f39929"
-
 to-fast-properties@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/to-fast-properties/-/to-fast-properties-2.0.0.tgz#dc5e698cbd079265bc73e0377681a4e4e83f616e"
@@ -2088,6 +2084,10 @@ trim-right@^1.0.1:
 tslib@^1.9.3:
   version "1.9.3"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.9.3.tgz#d7e4dd79245d85428c4d7e4822a79917954ca286"
+
+typescript-dotnet-es6@^4.11.2:
+  version "4.11.2"
+  resolved "https://registry.yarnpkg.com/typescript-dotnet-es6/-/typescript-dotnet-es6-4.11.2.tgz#3249759223a03fce7335918530d942bbe70a277d"
 
 typescript@^3.2.2:
   version "3.2.2"

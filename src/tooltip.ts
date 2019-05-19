@@ -1,14 +1,32 @@
-export default class Tooltip {
+export default class Tooltip
+{
+  /**
+   * Container
+   */
   private container: HTMLElement;
+
+  /**
+   * 表示文字列
+   */
   public text: string;
+
+  /**
+   * 表示位置 x
+   */
   public x: number = 0;
+
+  /**
+  * 表示位置 y
+  */
   public y: number = 0;
 
-  constructor() {
+  constructor()
+  {
     this.container = this.getOrCreateTooltipContainer("timeline-tooltip");
   }
 
-  public setPosition(x: number, y: number) {
+  public setPosition (x: number, y: number)
+  {
     this.x = x;
     this.y = y;
 
@@ -17,21 +35,24 @@ export default class Tooltip {
     this.container.style.top = (this.y - (this.container.offsetHeight + margin) + "px");
   }
 
-  public show(): void {
+  public show (): void
+  {
     if (this.container.innerHTML !== this.text) {
       this.container.innerHTML = this.text;
     }
     this.container.style.visibility = "visible";
   }
 
-  public hide(): void {
+  public hide (): void
+  {
     if (!this.container.innerHTML) {
       this.container.innerHTML = "";
     }
     this.container.style.visibility = "collapse";
   }
 
-  private getOrCreateTooltipContainer(id: string): HTMLElement {
+  private getOrCreateTooltipContainer (id: string): HTMLElement
+  {
     let containerElement: HTMLElement = document.getElementById(id);
     if (containerElement) {
       return containerElement;
