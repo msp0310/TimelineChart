@@ -51,7 +51,7 @@ export class Config
   {
     config = config || {};
     this.borderColor = config.borderColor || '#000';
-    this.borderWidth = Number(config.borderWidth || 1);
+    this.borderWidth = parseInt(config.borderWidth || '1');
     this.backgroundColor = config.backgroundColor || "transparent";
     this.tooltip = config.tooltip;
     this.layout = LayoutConfig.from(config.layout || {});
@@ -100,7 +100,7 @@ class TimeConfig
 
     const timeConfig = new TimeConfig();
     timeConfig.start = DateTimeHelper.parse(config.start || '00:00');
-    timeConfig.end = DateTimeHelper.parse(config.end || '24:00');
+    timeConfig.end = config.end ? DateTimeHelper.parse(config.end) : timeConfig.start.addDays(1);
 
     return timeConfig;
   }
@@ -181,12 +181,12 @@ class PaddingConfig
 
   public get x (): number
   {
-    return this.top + this.bottom;
+    return this.left + this.right;
   }
 
   public get y (): number
   {
-    return this.left + this.right;
+    return this.top + this.bottom;
   }
 
   static from (

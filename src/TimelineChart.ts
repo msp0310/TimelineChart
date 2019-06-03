@@ -58,7 +58,7 @@ export default class TimelineChart
    */
   public get elementWidth (): number
   {
-    return this.element.clientWidth;
+    return this.element.width;
   }
 
   /**
@@ -66,7 +66,7 @@ export default class TimelineChart
   */
   public get elementHeight (): number
   {
-    return this.element.clientHeight
+    return this.element.height
   }
 
   /**
@@ -77,7 +77,7 @@ export default class TimelineChart
   {
     return this.elementWidth -
       this.config.borderWidth -
-      (this.config.layout.padding.left + this.config.layout.padding.right);
+      (this.config.layout.padding.x);
   }
 
   /**
@@ -85,7 +85,9 @@ export default class TimelineChart
    */
   public get drawableHeight (): number
   {
-    return this.elementHeight;
+    return this.elementHeight -
+      (this.config.borderWidth * 2) -
+      this.config.layout.padding.y;
   }
 
   constructor(element: HTMLCanvasElement, obj: any)
@@ -150,22 +152,24 @@ export default class TimelineChart
         return
       }
 
-      let x = borderWidth
+      let x = borderWidth + self.config.layout.padding.left
       if (index > 0) {
         const startMinutes = DateTime.between(startDateTime, timeUnit.startTime).minutes
-        x = startMinutes * self.oneMinuteWidth;
+        x += startMinutes * self.oneMinuteWidth;
       }
 
-      const y = borderWidth;
-      const height = self.drawableHeight - borderWidth * 2;
+      const y = borderWidth + self.config.layout.padding.top;
+      const height = self.drawableHeight;
       const width = timeUnit.width;
       self.canvas.fillStyle = timeUnit.color;
       self.canvas.fillRect(x, y, width, height);
 
       if (labelConfig.showLabel) {
+        const textLeftMargin = 5;
         self.canvas.fillStyle = 'black';
+        self.canvas.textBaseline = 'middle'
         self.canvas.font = labelConfig.fontSize + ' ' + labelConfig.fontFamily
-        self.canvas.fillText(timeUnit.label, x, height / 2 + 5, width)
+        self.canvas.fillText(timeUnit.label, x + textLeftMargin, y + (height / 2), width - textLeftMargin)
       }
     })
   }
@@ -230,8 +234,8 @@ export default class TimelineChart
     this.canvas.strokeRect(
       padding.left,
       padding.top,
-      this.element.width - padding.y,
-      this.element.height - padding.x
+      this.element.width - padding.x,
+      this.element.height - padding.y
     );
   }
 
@@ -246,8 +250,8 @@ export default class TimelineChart
     this.canvas.fillRect(
       this.config.layout.padding.left,
       this.config.layout.padding.top,
-      this.drawableWidth,
-      this.drawableHeight - padding.x
+      this.element.width - padding.x,
+      this.element.height - padding.y
     );
   }
   // #endregion

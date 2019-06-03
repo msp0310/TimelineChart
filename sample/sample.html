@@ -28,6 +28,7 @@
   <pre id="data"></pre>
 
   <script>
+
     const data = [{
       "startTime": "06:00",
       "endTime": "07:00",
@@ -75,11 +76,6 @@
           fontFamily: 'メイリオ',
           fontSize: '12px',
         },
-        tooltip: function (unit) {
-          return `開始時間: ${ unit.startTimeText }
-          <br>終了時間: ${unit.endTimeText }
-          <br>ラベル: ${unit.label }`
-        }
       },
       data: data
     });

@@ -7,7 +7,7 @@ export default class DateTimeHelper
   {
     const matchArray = dateString.match(/^[0-9]{4}\/[0-9]{2}\/[0-9]{2}$/);
     const date = matchArray ? matchArray[0] : null
-    const time = dateString.replace(date, '').trimLeft().split(':')
+    const time = dateString.replace(date, '').trim().replace("：", ":").split(':')
 
     let datetime = date == null || date.length == 0
       ? DateTime.today : new DateTime(date);
