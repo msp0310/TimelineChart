@@ -1,5 +1,4 @@
-export default class Tooltip
-{
+export default class Tooltip {
   /**
    * Container
    */
@@ -8,7 +7,7 @@ export default class Tooltip
   /**
    * 表示文字列
    */
-  public text: string;
+  public text!: string;
 
   /**
    * 表示位置 x
@@ -16,59 +15,53 @@ export default class Tooltip
   public x: number = 0;
 
   /**
-  * 表示位置 y
-  */
+   * 表示位置 y
+   */
   public y: number = 0;
 
-  constructor()
-  {
+  constructor() {
     this.container = this.getOrCreateTooltipContainer("timeline-tooltip");
   }
 
-  public setPosition (x: number, y: number)
-  {
+  public setPosition(x: number, y: number) {
     this.x = x;
     this.y = y;
 
     const margin = 15;
-    this.container.style.left = this.x - (this.container.offsetWidth / 2) + "px";
-    this.container.style.top = (this.y - (this.container.offsetHeight + margin) + "px");
+    this.container.style.left = this.x - this.container.offsetWidth / 2 + "px";
+    this.container.style.top =
+      this.y - (this.container.offsetHeight + margin) + "px";
   }
 
-  public show (): void
-  {
-    if (this.container.innerHTML !== this.text) {
-      this.container.innerHTML = this.text;
-    }
+  public show(): void {
+    this.container.innerHTML = this.text;
     this.container.style.visibility = "visible";
   }
 
-  public hide (): void
-  {
-    if (!this.container.innerHTML) {
-      this.container.innerHTML = "";
+  public hide(): void {
+    if (!this.container.textContent) {
+      this.container.textContent = "";
     }
     this.container.style.visibility = "collapse";
   }
 
-  private getOrCreateTooltipContainer (id: string): HTMLElement
-  {
-    let containerElement: HTMLElement = document.getElementById(id);
+  private getOrCreateTooltipContainer(id: string): HTMLElement {
+    let containerElement: HTMLElement | null = document.getElementById(id);
     if (containerElement) {
       return containerElement;
     }
 
-    containerElement = document.createElement("div");
-    containerElement.id = id;
-    containerElement.style.width = "auto";
-    containerElement.style.height = "auto";
-    containerElement.style.position = "absolute";
-    containerElement.style.border = "1px solid #ccc";
-    containerElement.style.background = "#fff";
-    containerElement.style.visibility = "collapse";
-    containerElement.style.padding = "5px";
-    containerElement.style.zIndex = '99999';
-    document.getElementsByTagName("body")[0].appendChild(containerElement);
-    return containerElement;
+    const created = document.createElement("div");
+    created.id = id;
+    created.style.width = "auto";
+    created.style.height = "auto";
+    created.style.position = "absolute";
+    created.style.border = "1px solid #ccc";
+    created.style.background = "#fff";
+    created.style.visibility = "collapse";
+    created.style.padding = "5px";
+    created.style.zIndex = "99999";
+    document.getElementsByTagName("body")[0].appendChild(created);
+    return created;
   }
 }

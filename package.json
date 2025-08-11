@@ -2,29 +2,31 @@
   "name": "timeline-chart",
   "version": "0.1.4",
   "description": "",
-  "main": "timeline-chart.js",
+  "main": "dist/TimelineChart.js",
+  "module": "dist/TimelineChart.js",
+  "types": "dist/TimelineChart.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/TimelineChart.d.ts",
+      "default": "./dist/TimelineChart.js"
+    }
+  },
+  "type": "module",
   "scripts": {
-    "build": "node ./node_modules/rollup/bin/rollup -c",
-    "watch": "node ./node_modules/rollup/bin/rollup -c --watch",
+    "build": "rollup -c",
+    "watch": "rollup -c --watch",
+    "types": "tsc -p tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Sawada Makoto",
   "license": "MIT",
-  "dependencies": {
-    "typescript-dotnet-es6": "^4.11.2"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@babel/core": "^7.2.2",
-    "@babel/polyfill": "^7.0.0",
-    "@babel/preset-env": "^7.2.0",
-    "rollup": "^0.67.4",
-    "rollup-plugin-babel": "^4.1.0",
-    "rollup-plugin-babel-minify": "^6.2.0",
-    "rollup-plugin-commonjs": "^9.2.0",
-    "rollup-plugin-node-resolve": "^4.0.0",
-    "rollup-plugin-typescript": "^1.0.0",
-    "rollup-watch": "^4.3.1",
-    "tslib": "^1.9.3",
-    "typescript": "^3.2.2"
+    "@rollup/plugin-commonjs": "^25.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-typescript": "^11.1.0",
+    "rollup": "^4.0.0",
+    "tslib": "^2.6.0",
+    "typescript": "^5.4.0"
   }
 }

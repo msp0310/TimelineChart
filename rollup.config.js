@@ -1,28 +1,27 @@
-import babel from 'rollup-plugin-babel'
-import nodeResolve from 'rollup-plugin-node-resolve'
-import commonjs from 'rollup-plugin-commonjs'
-import typescript from 'rollup-plugin-typescript'
-import pkg from './package.json'
+import nodeResolve from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
+import typescript from "@rollup/plugin-typescript";
+import { readFileSync } from "fs";
+const pkg = JSON.parse(
+  readFileSync(new URL("./package.json", import.meta.url), "utf-8")
+);
 
-const banner = `/*!
- * Timeline.js v${pkg.version }
- *
- * (c) ${new Date().getFullYear() } Sawada Makoto.
- * Released under the MIT License
- */`;
+const banner = `/*!\n * TimelineChart v${
+  pkg.version
+}\n * (c) ${new Date().getFullYear()} Sawada Makoto.\n * Released under the MIT License\n */`;
 
 export default {
-  entry: 'src/TimelineChart.ts',
-  dest: 'dist/TimelineChart.js',
-  format: 'umd',
-  moduleName: 'TimelineChart',
-  banner: banner,
+  input: "src/TimelineChart.ts",
+  output: {
+    file: "dist/TimelineChart.js",
+    format: "umd",
+    name: "TimelineChart",
+    banner,
+    sourcemap: true,
+  },
   plugins: [
-    typescript(),
-    nodeResolve({
-      jsNext: true
-    }),
+    nodeResolve(),
     commonjs(),
-    babel()
-  ]
-}
+    typescript({ tsconfig: "./tsconfig.json" }),
+  ],
+};
