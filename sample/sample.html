@@ -24,6 +24,9 @@
   <h2>Chart</h2>
   <canvas id="chart" width="1000" height="70"></canvas>
 
+  <h2>Hour Band Only</h2>
+  <canvas id="chartHourOnly" width="1000" height="30"></canvas>
+
   <h2>Data</h2>
   <pre id="data"></pre>
 
@@ -116,6 +119,18 @@
       data: data
     });
     chart.draw();
+
+    // 時間帯のみ表示サンプル
+    const hourOnly = new TimelineChart(document.getElementById('chartHourOnly'), {
+      config: {
+        time: { start: "2025-08-11 06:00", end: "2025-08-11 18:00" },
+        borderWidth: 1,
+        backgroundColor: 'white',
+        hourBand: { show: true, only: true, placement: 'bottom', showSeparators: true }
+      },
+      data: []
+    });
+    hourOnly.draw();
   </script>
 </body>
 

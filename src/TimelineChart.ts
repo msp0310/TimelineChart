@@ -99,7 +99,9 @@ export default class TimelineChart {
   /** ユニット描画領域の上端オフセット */
   private get unitsTopOffset(): number {
     if (!this.config.hourBand?.show) return 0;
-    return this.config.hourBand.placement === 'top' ? this.config.hourBand.height : 0;
+    return this.config.hourBand.placement === "top"
+      ? this.config.hourBand.height
+      : 0;
   }
 
   /** ユニット描画領域高さ */
@@ -278,7 +280,12 @@ export default class TimelineChart {
             const totalTextHeight = lines.length * lineHeight;
             let startY = verticalCenter - totalTextHeight / 2 + lineHeight / 2;
             for (let li = 0; li < lines.length; li++) {
-              self.canvas.fillText(lines[li], x + 2, startY + li * lineHeight, available);
+              self.canvas.fillText(
+                lines[li],
+                x + 2,
+                startY + li * lineHeight,
+                available
+              );
             }
           } else {
             let text = timeUnit.label;
@@ -394,11 +401,10 @@ export default class TimelineChart {
    */
   private drawBackground() {
     const padding = this.config.layout.padding;
-
     this.canvas.fillStyle = this.config.backgroundColor;
     this.canvas.fillRect(
-      this.config.layout.padding.left,
-      this.config.layout.padding.top,
+      padding.left,
+      padding.top,
       this.drawableWidth,
       this.drawableHeight - padding.x
     );
@@ -452,14 +458,20 @@ export default class TimelineChart {
     const start = this.config.time.start.toDate();
     const end = this.config.time.end.toDate();
     const oneMinuteWidth = this.oneMinuteWidth;
-    const totalWidth = this.drawableWidth - (padding.left + padding.right);
-    const placementTop = hb.placement === 'top';
-    const yBase = padding.top + borderWidth + (placementTop ? 0 : this.unitsDrawableHeight);
+    const placementTop = hb.placement === "top";
+
+    // only モードではバンドを全高に拡張
+    const hourHeight = hb.only
+      ? this.drawableHeight - (padding.top + padding.bottom) - borderWidth * 2
+      : hb.height;
+    const bandY = placementTop
+      ? padding.top + borderWidth
+      : this.elementHeight - padding.bottom - borderWidth - hourHeight;
 
     // 背景帯
     this.canvas.save();
-    this.canvas.font = hb.fontSize + ' ' + hb.fontFamily;
-    this.canvas.textBaseline = 'middle';
+    this.canvas.font = hb.fontSize + " " + hb.fontFamily;
+    this.canvas.textBaseline = "middle";
     this.canvas.fillStyle = hb.color;
 
     // 開始を次の「分=0」へ丸め
@@ -470,8 +482,7 @@ export default class TimelineChart {
         cursor.setHours(cursor.getHours() + 1);
       }
     }
-    const hourHeight = hb.height;
-    const bandY = placementTop ? yBase : yBase - hb.height;
+  // (上で算出済み)
 
     while (cursor.getTime() < end.getTime()) {
       const hourStartMs = cursor.getTime();
@@ -484,7 +495,7 @@ export default class TimelineChart {
       const w = minutesLen * oneMinuteWidth;
 
       // 交互塗り
-      if (hb.alternateFill && (cursor.getHours() % 2 === 1)) {
+      if (hb.alternateFill && cursor.getHours() % 2 === 1) {
         this.canvas.fillStyle = hb.alternateFill;
         this.canvas.fillRect(x, bandY, w, hourHeight);
       }
@@ -501,7 +512,7 @@ export default class TimelineChart {
 
       // 時刻ラベル
       this.canvas.fillStyle = hb.color;
-      const hourStr = ('0' + cursor.getHours()).slice(-2);
+      const hourStr = ("0" + cursor.getHours()).slice(-2);
       const textX = x + 2;
       const textY = bandY + hourHeight / 2;
       this.canvas.fillText(hourStr, textX, textY, w - 4);
@@ -516,7 +527,7 @@ export default class TimelineChart {
     this.canvas.strokeRect(
       padding.left + borderWidth,
       bandY,
-      this.drawableWidth - (padding.left + padding.right) - borderWidth * 2,
+      this.drawableWidth - borderWidth * 2,
       hourHeight
     );
 
