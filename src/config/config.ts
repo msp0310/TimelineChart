@@ -118,11 +118,23 @@ class LabelConfig {
    */
   public showLabel!: boolean;
 
+  /**
+   * ラベルを表示する最小幅(px)。これ未満なら描画しない
+   */
+  public minWidthForText!: number;
+
+  /**
+   * 省略表示に "…" を使うか
+   */
+  public useEllipsis!: boolean;
+
   static from(config: any) {
     const labelConfig = new LabelConfig();
     labelConfig.fontFamily = config.fontFamily || "メイリオ";
     labelConfig.fontSize = config.fontSize || "14px";
     labelConfig.showLabel = config.showLabel || false;
+  labelConfig.minWidthForText = Number(config.minWidthForText || 20); // 20px 未満は読めないので非表示
+  labelConfig.useEllipsis = config.useEllipsis !== undefined ? !!config.useEllipsis : true;
 
     return labelConfig;
   }

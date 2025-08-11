@@ -209,7 +209,38 @@ export default class TimelineChart {
         self.canvas.font = labelConfig.fontSize + " " + labelConfig.fontFamily;
         // 垂直中央寄せ (テキストベースライン調整)
         self.canvas.textBaseline = "middle";
-        self.canvas.fillText(timeUnit.label, x + 2, y + height / 2, width - 4);
+        // 最小幅チェック
+        if (width >= labelConfig.minWidthForText) {
+          let text = timeUnit.label;
+          // 省略処理: 実際の描画幅を measureText で確認し、幅を超える場合は短縮
+          const available = width - 4; // 左右 2px ずつマージン
+          let measured = self.canvas.measureText(text).width;
+          if (measured > available) {
+            if (!labelConfig.useEllipsis) {
+              // 非表示 (狭すぎ)
+              return;
+            }
+            const ellipsis = "…";
+            const ellipsisWidth = self.canvas.measureText(ellipsis).width;
+            // 二分探索で切れる位置を探す
+            let left = 0;
+            let right = text.length - 1;
+            let cut = 0;
+            while (left <= right) {
+              const mid = (left + right) >> 1;
+              const substr = text.slice(0, mid + 1);
+              const w = self.canvas.measureText(substr).width + ellipsisWidth;
+              if (w <= available) {
+                cut = mid + 1;
+                left = mid + 1;
+              } else {
+                right = mid - 1;
+              }
+            }
+            text = text.slice(0, cut) + ellipsis;
+          }
+          self.canvas.fillText(text, x + 2, y + height / 2, available);
+        }
       }
     });
   }
