@@ -43,9 +43,7 @@ export default class TimelineChart {
   /** イベントハンドラ参照保持 */
   private mouseMoveHandler: (ev: MouseEvent) => void;
   private mouseOutHandler: (ev: MouseEvent) => void;
-  private resizeHandler: () => void;
-  private resizeObserver?: ResizeObserver;
-  private currentDpr: number = (window as any).devicePixelRatio || 1;
+  // リサイズ時の再描画は無効化したためハンドラ類は撤去
 
   /**
    * 合計（分）
@@ -123,8 +121,16 @@ export default class TimelineChart {
     this.tooltip = new Tooltip();
     this.config = new Config(obj?.config || {});
 
-  // 初期 DPI / サイズ反映
-  this.updateCanvasSize();
+    // 初回のみ DPI を反映 (リサイズ時の再描画は行わない)
+    const dpr = (window as any).devicePixelRatio || 1;
+    const rect = this.element.getBoundingClientRect();
+    if (rect.width && rect.height) {
+      this.element.width = Math.max(1, Math.round(rect.width * dpr));
+      this.element.height = Math.max(1, Math.round(rect.height * dpr));
+      if (dpr !== 1) {
+        this.canvas.scale(dpr, dpr);
+      }
+    }
 
     // generate time units with validation / clipping
     const startBoundary = this.config.time.start;
@@ -169,23 +175,7 @@ export default class TimelineChart {
     this.element.addEventListener("mousemove", this.mouseMoveHandler, false);
     this.element.addEventListener("mouseout", this.mouseOutHandler, false);
 
-    // リサイズ対応: requestAnimationFrame デバウンス
-    let resizeScheduled = false;
-    this.resizeHandler = () => {
-      if (resizeScheduled) return;
-      resizeScheduled = true;
-      requestAnimationFrame(() => {
-        resizeScheduled = false;
-        this.handleResize();
-      });
-    };
-    window.addEventListener("resize", this.resizeHandler, false);
-
-    // ResizeObserver で要素サイズ変化をより正確に検知
-    if ((window as any).ResizeObserver) {
-      this.resizeObserver = new ResizeObserver(() => this.handleResize());
-      this.resizeObserver.observe(this.element);
-    }
+  // リサイズ時の再描画処理は要求により削除
   }
 
   /**
@@ -438,12 +428,6 @@ export default class TimelineChart {
     if (this.mouseOutHandler) {
       this.element.removeEventListener("mouseout", this.mouseOutHandler);
     }
-    if (this.resizeHandler) {
-      window.removeEventListener("resize", this.resizeHandler);
-    }
-    if (this.resizeObserver) {
-      try { this.resizeObserver.disconnect(); } catch {}
-    }
   }
   // #endregion
 
@@ -560,30 +544,5 @@ export default class TimelineChart {
     this.canvas.restore();
   }
 
-  /** リサイズ処理 */
-  private handleResize(): void {
-    const newDpr = (window as any).devicePixelRatio || 1;
-    if (newDpr !== this.currentDpr) {
-      this.currentDpr = newDpr;
-    }
-    this.updateCanvasSize();
-    this.draw();
-  }
-
-  /** CSS サイズと DPR に合わせて内部バッファを更新 */
-  private updateCanvasSize(): void {
-    const dpr = this.currentDpr;
-    const cssW = this.element.clientWidth || this.element.width / dpr;
-    const cssH = this.element.clientHeight || this.element.height / dpr;
-    const targetW = Math.max(1, Math.round(cssW * dpr));
-    const targetH = Math.max(1, Math.round(cssH * dpr));
-    if (this.element.width !== targetW || this.element.height !== targetH) {
-      this.element.width = targetW;
-      this.element.height = targetH;
-      this.canvas.setTransform(1, 0, 0, 1, 0, 0);
-      if (dpr !== 1) {
-        this.canvas.scale(dpr, dpr);
-      }
-    }
-  }
+  // リサイズ関連メソッドは削除済み
 }
