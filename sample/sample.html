@@ -22,7 +22,7 @@
   <h1>Timeline Chart</h1>
 
   <h2>Chart</h2>
-  <canvas id="chart" width="1000" height="50"></canvas>
+  <canvas id="chart" width="1000" height="70"></canvas>
 
   <h2>Data</h2>
   <pre id="data"></pre>
@@ -100,6 +100,14 @@
           showLabel: true,
           fontFamily: 'メイリオ',
           fontSize: '12px',
+          wrap: true,
+          maxLines: 2,
+          lineHeight: 1.2,
+        },
+        hourBand: {
+          show: true,
+          placement: 'top',
+          alternateFill: 'rgba(0,0,0,0.03)'
         },
         tooltip: function (unit) {
           return `開始: ${unit.startTimeText}<br>終了: ${unit.endTimeText}<br>ラベル: ${unit.label}`
