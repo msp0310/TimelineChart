@@ -1,4 +1,4 @@
-import DateTime from "typescript-dotnet-es6/System/Time/DateTime"
+import { DateTime } from "./core/TimeSpan";
 
 /**
  * Time Unit Element.
@@ -47,7 +47,7 @@ export default class TimeUnitElement
 
   public get totalMinutes (): number
   {
-    return DateTime.between(this.startTime, this.endTime).minutes
+  return DateTime.between(this.startTime, this.endTime).minutes
   }
 
   public get startTimeText (): string
