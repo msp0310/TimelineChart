@@ -125,6 +125,8 @@ export default class TimelineChart {
     const dpr = (window as any).devicePixelRatio || 1;
     const rect = this.element.getBoundingClientRect();
     if (rect.width && rect.height) {
+  // 以前のインスタンスで scale が残っている可能性があるため一旦リセット
+  try { this.canvas.setTransform(1, 0, 0, 1, 0, 0); } catch {}
       this.element.width = Math.max(1, Math.round(rect.width * dpr));
       this.element.height = Math.max(1, Math.round(rect.height * dpr));
       if (dpr !== 1) {
