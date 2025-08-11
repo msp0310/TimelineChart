@@ -14,7 +14,7 @@ HTML5 Canvas を用いて「時間帯の状態遷移 (稼働 / 停止 など)」
 - HH:mm / YYYY-MM-DD HH:mm / YYYY/MM/DD HH:mm / ISO 8601 文字列対応
 - マルチデイ(開始と終了が日付跨ぎ)をシームレスに描画
 - ラベル: 省略 (…)/ 折り返し / 最小幅制御
-- 時間帯バンド (時刻HH) を上下に追加表示 / 単独表示可能
+- 時間帯バンド (時刻 HH) を上下に追加表示 / 単独表示可能
 - DPI 対応 (HiDPI/Retina で鮮明)
 - 任意ラベル表示 (フォント/サイズ指定可)
 - カスタムツールチップ (HTML 直接 / XSS 考慮は利用側で)
@@ -72,8 +72,8 @@ chart.draw();
 interface TimelineChartOptions {
   config: ConfigLike;
   data: Array<{
-  startTime: string; // 時刻 or 日時
-  endTime: string;   // 同上
+    startTime: string; // 時刻 or 日時
+    endTime: string; // 同上
     color?: string;
     label?: string; // ラベル表示 (label.showLabel=true の場合に描画)
   }>;
@@ -108,7 +108,7 @@ interface TimelineChartOptions {
 | hourBand.color                       | string             | `#000`        | 時刻文字色                             |
 | hourBand.lineColor                   | string             | `#ccc`        | 区切り線色                             |
 | hourBand.showSeparators              | boolean            | `true`        | 時間ごと縦線表示                       |
-| hourBand.alternateFill               | string?            | `undefined`   | 奇数時間背景色 (透明推奨)             |
+| hourBand.alternateFill               | string?            | `undefined`   | 奇数時間背景色 (透明推奨)              |
 
 ### Tooltip コールバック引数 (TimeUnitElement)
 
@@ -149,23 +149,43 @@ interface TimelineChartOptions {
 ```html
 <canvas id="chart" width="1000" height="70"></canvas>
 <script>
-  const chart = new TimelineChart(document.getElementById('chart'), {
+  const chart = new TimelineChart(document.getElementById("chart"), {
     config: {
       time: {
-        start: '2025-08-11 06:00',
-        end:   '2025-08-12 05:59'
+        start: "2025-08-11 06:00",
+        end: "2025-08-12 05:59",
       },
       borderWidth: 1,
-      backgroundColor: 'white',
-      label: { showLabel: true, fontSize: '12px', wrap: true, maxLines: 2 },
-      hourBand: { show: true, placement: 'top', alternateFill: 'rgba(0,0,0,0.03)' },
-      tooltip: u => `開始: ${u.startTimeText}<br>終了: ${u.endTimeText}<br>${u.label}`
+      backgroundColor: "white",
+      label: { showLabel: true, fontSize: "12px", wrap: true, maxLines: 2 },
+      hourBand: {
+        show: true,
+        placement: "top",
+        alternateFill: "rgba(0,0,0,0.03)",
+      },
+      tooltip: (u) =>
+        `開始: ${u.startTimeText}<br>終了: ${u.endTimeText}<br>${u.label}`,
     },
     data: [
-      { startTime: '2025-08-11 06:00', endTime: '2025-08-11 07:00', color: 'rgba(255,0,0,1)', label: '計画停止' },
-      { startTime: '2025-08-11 07:00', endTime: '2025-08-11 12:00', color: 'rgba(0,255,0,1)', label: '正常運転' },
-      { startTime: '2025-08-11 23:30', endTime: '2025-08-12 00:30', color: 'rgba(0,128,255,1)', label: '夜間メンテ' }
-    ]
+      {
+        startTime: "2025-08-11 06:00",
+        endTime: "2025-08-11 07:00",
+        color: "rgba(255,0,0,1)",
+        label: "計画停止",
+      },
+      {
+        startTime: "2025-08-11 07:00",
+        endTime: "2025-08-11 12:00",
+        color: "rgba(0,255,0,1)",
+        label: "正常運転",
+      },
+      {
+        startTime: "2025-08-11 23:30",
+        endTime: "2025-08-12 00:30",
+        color: "rgba(0,128,255,1)",
+        label: "夜間メンテ",
+      },
+    ],
   });
   chart.draw();
 </script>
