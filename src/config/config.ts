@@ -5,8 +5,7 @@ import DateTimeHelper from "../extensions/DateTimeExtension";
 /**
  * 設定.
  */
-export class Config
-{
+export class Config {
   /**
    * 背景色
    */
@@ -35,72 +34,66 @@ export class Config
   /**
    * 範囲設定
    */
-  public time: TimeConfig
-
+  public time: TimeConfig;
 
   /**
    * ラベルの設定
    */
-  public label: LabelConfig
+  public label: LabelConfig;
 
   /**
    * Constructor
    * @param config Config
    */
-  constructor(config: any)
-  {
+  constructor(config: any) {
     config = config || {};
-    this.borderColor = config.borderColor || '#000';
+    this.borderColor = config.borderColor || "#000";
     this.borderWidth = Number(config.borderWidth || 1);
     this.backgroundColor = config.backgroundColor || "transparent";
     this.tooltip = config.tooltip;
     this.layout = LayoutConfig.from(config.layout || {});
-    this.time = TimeConfig.from(config.time || {})
-    this.label = LabelConfig.from(config.label || {})
+    this.time = TimeConfig.from(config.time || {});
+    this.label = LabelConfig.from(config.label || {});
   }
 }
 
 /**
  * TimeUnit Config.
  */
-class TimeUnitConfig
-{
-  public startTime: string;
-  public endTime: string;
-  public color: string;
-  public label: string;
+class TimeUnitConfig {
+  public startTime!: string;
+  public endTime!: string;
+  public color!: string;
+  public label!: string;
 }
 
 /**
  * 時間に関する設定
  */
-class TimeConfig
-{
+class TimeConfig {
   /**
    * 開始時間
    */
-  public start: DateTime
+  public start!: DateTime;
 
   /**
    * 終了時間
    */
-  public end: DateTime
+  public end!: DateTime;
 
   /**
    * 合計(分)
    */
-  public get totalMinutes (): number
-  {
-    return DateTime.between(this.start, this.end).minutes
+  public get totalMinutes(): number {
+    return DateTime.between(this.start, this.end).minutes;
   }
 
-  static from (config: any)
-  {
-    config = config || {}
+  static from(config: any) {
+    config = config || {};
 
     const timeConfig = new TimeConfig();
-    timeConfig.start = DateTimeHelper.parse(config.start || '00:00');
-    timeConfig.end = DateTimeHelper.parse(config.end || '24:00');
+    timeConfig.start = DateTimeHelper.parse(config.start || "00:00");
+    timeConfig.end = DateTimeHelper.parse(config.end || "24:00");
 
     return timeConfig;
   }
@@ -109,46 +102,47 @@ class TimeConfig
 /**
  * ラベルに関する設定
  */
-class LabelConfig
-{
+class LabelConfig {
   /**
-    * フォントの種類
+   * フォントの種類
    */
-  public fontFamily: string;
+  public fontFamily!: string;
 
   /**
    * フォントサイズ
    */
-  public fontSize: string
+  public fontSize!: string;
 
   /**
    * ラベルの表示有無
    */
-  public showLabel: boolean
+  public showLabel!: boolean;
 
-  static from (config: any)
-  {
-    const labelConfig = new LabelConfig
-    labelConfig.fontFamily = config.fontFamily || 'メイリオ'
-    labelConfig.fontSize = config.fontSize || '14px'
-    labelConfig.showLabel = config.showLabel || false
+  static from(config: any) {
+    const labelConfig = new LabelConfig();
+    labelConfig.fontFamily = config.fontFamily || "メイリオ";
+    labelConfig.fontSize = config.fontSize || "14px";
+    labelConfig.showLabel = config.showLabel || false;
 
-    return labelConfig
+    return labelConfig;
   }
 }
 
 /**
  * レイアウトに関する設定
  */
-class LayoutConfig
-{
-  public padding: PaddingConfig;
+class LayoutConfig {
+  public padding!: PaddingConfig;
 
-  static from (layout: any)
-  {
+  static from(layout: any) {
     const padding = layout.padding || {};
-    const config = new LayoutConfig()
-    config.padding = PaddingConfig.from(padding.left, padding.top, padding.right, padding.bottom);
+    const config = new LayoutConfig();
+    config.padding = PaddingConfig.from(
+      padding.left,
+      padding.top,
+      padding.right,
+      padding.bottom
+    );
 
     return config;
   }
@@ -157,50 +151,46 @@ class LayoutConfig
 /**
  * Paddingの設定
  */
-class PaddingConfig
-{
+class PaddingConfig {
   /**
    * Left
    */
-  public left: number;
+  public left!: number;
 
   /**
    * Top
    */
-  public top: number;
+  public top!: number;
 
   /**
    * Right
    */
-  public right: number;
+  public right!: number;
 
   /**
    * Bottom
    */
-  public bottom: number;
+  public bottom!: number;
 
-  public get x (): number
-  {
+  public get x(): number {
     return this.top + this.bottom;
   }
 
-  public get y (): number
-  {
+  public get y(): number {
     return this.left + this.right;
   }
 
-  static from (
+  static from(
     left: string,
     top: string,
     right: string,
     bottom: string
-  ): PaddingConfig
-  {
+  ): PaddingConfig {
     const paddingConfig = new PaddingConfig();
-    paddingConfig.left = parseInt(left || '0');
-    paddingConfig.top = parseInt(top || '0');
-    paddingConfig.right = parseInt(right || '0');
-    paddingConfig.bottom = parseInt(bottom || '0');
+    paddingConfig.left = parseInt(left || "0");
+    paddingConfig.top = parseInt(top || "0");
+    paddingConfig.right = parseInt(right || "0");
+    paddingConfig.bottom = parseInt(bottom || "0");
 
     return paddingConfig;
   }

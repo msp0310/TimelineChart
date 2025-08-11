@@ -1,5 +1,4 @@
-export default class Tooltip
-{
+export default class Tooltip {
   /**
    * Container
    */
@@ -8,7 +7,7 @@ export default class Tooltip
   /**
    * 表示文字列
    */
-  public text: string;
+  public text!: string;
 
   /**
    * 表示位置 x
@@ -16,27 +15,25 @@ export default class Tooltip
   public x: number = 0;
 
   /**
-  * 表示位置 y
-  */
+   * 表示位置 y
+   */
   public y: number = 0;
 
-  constructor()
-  {
+  constructor() {
     this.container = this.getOrCreateTooltipContainer("timeline-tooltip");
   }
 
-  public setPosition (x: number, y: number)
-  {
+  public setPosition(x: number, y: number) {
     this.x = x;
     this.y = y;
 
     const margin = 15;
-    this.container.style.left = this.x - (this.container.offsetWidth / 2) + "px";
-    this.container.style.top = (this.y - (this.container.offsetHeight + margin) + "px");
+    this.container.style.left = this.x - this.container.offsetWidth / 2 + "px";
+    this.container.style.top =
+      this.y - (this.container.offsetHeight + margin) + "px";
   }
 
-  public show (): void
-  {
+  public show(): void {
     // XSS緩和: textContent を用い HTMLは解釈させない
     if (this.container.textContent !== this.text) {
       this.container.textContent = this.text;
@@ -44,16 +41,14 @@ export default class Tooltip
     this.container.style.visibility = "visible";
   }
 
-  public hide (): void
-  {
+  public hide(): void {
     if (!this.container.textContent) {
       this.container.textContent = "";
     }
     this.container.style.visibility = "collapse";
   }
 
-  private getOrCreateTooltipContainer (id: string): HTMLElement
-  {
+  private getOrCreateTooltipContainer(id: string): HTMLElement {
     let containerElement: HTMLElement | null = document.getElementById(id);
     if (containerElement) {
       return containerElement;
@@ -68,7 +63,7 @@ export default class Tooltip
     created.style.background = "#fff";
     created.style.visibility = "collapse";
     created.style.padding = "5px";
-    created.style.zIndex = '99999';
+    created.style.zIndex = "99999";
     document.getElementsByTagName("body")[0].appendChild(created);
     return created;
   }
