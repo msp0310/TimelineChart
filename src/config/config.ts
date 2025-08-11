@@ -171,8 +171,8 @@ class LabelConfig {
     labelConfig.lineHeight = Number(config.lineHeight || 1.2);
     labelConfig.autoContrast = config.autoContrast !== undefined ? !!config.autoContrast : true;
     labelConfig.contrastThreshold = Number(
-      config.contrastThreshold !== undefined ? config.contrastThreshold : 140
-    );
+      config.contrastThreshold !== undefined ? config.contrastThreshold : 160
+    ); // 160 に引き上げ (より明るい赤系でも白文字になるよう調整)
 
     return labelConfig;
   }
