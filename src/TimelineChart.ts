@@ -43,6 +43,7 @@ export default class TimelineChart {
   /** イベントハンドラ参照保持 */
   private mouseMoveHandler: (ev: MouseEvent) => void;
   private mouseOutHandler: (ev: MouseEvent) => void;
+  private resizeHandler: () => void;
 
   /**
    * 合計（分）
@@ -172,6 +173,18 @@ export default class TimelineChart {
     this.mouseOutHandler = (ev: MouseEvent) => this.onMouseOut(this, ev);
     this.element.addEventListener("mousemove", this.mouseMoveHandler, false);
     this.element.addEventListener("mouseout", this.mouseOutHandler, false);
+
+    // リサイズ対応: requestAnimationFrame デバウンス
+    let resizeScheduled = false;
+    this.resizeHandler = () => {
+      if (resizeScheduled) return;
+      resizeScheduled = true;
+      requestAnimationFrame(() => {
+        resizeScheduled = false;
+        this.handleResize();
+      });
+    };
+    window.addEventListener("resize", this.resizeHandler, false);
   }
 
   /**
@@ -419,6 +432,9 @@ export default class TimelineChart {
     if (this.mouseOutHandler) {
       this.element.removeEventListener("mouseout", this.mouseOutHandler);
     }
+    if (this.resizeHandler) {
+      window.removeEventListener("resize", this.resizeHandler);
+    }
   }
   // #endregion
 
@@ -533,5 +549,24 @@ export default class TimelineChart {
     }
 
     this.canvas.restore();
+  }
+
+  /** リサイズ処理 */
+  private handleResize(): void {
+    // 現在の CSS サイズを取得し canvas の内部バッファを更新
+    const dpr = (window as any).devicePixelRatio || 1;
+    const logicalWidth = this.element.clientWidth;
+    const logicalHeight = this.element.clientHeight;
+    // 既に同サイズなら skip
+    if (this.element.width !== logicalWidth * dpr || this.element.height !== logicalHeight * dpr) {
+      this.element.width = logicalWidth * dpr;
+      this.element.height = logicalHeight * dpr;
+      this.canvas.setTransform(1, 0, 0, 1, 0, 0); // reset
+      if (dpr !== 1) {
+        this.canvas.scale(dpr, dpr);
+      }
+    }
+    // 1分当たり幅は getter なので draw() 内で再計算される
+    this.draw();
   }
 }

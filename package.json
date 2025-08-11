@@ -20,9 +20,7 @@
   },
   "author": "Sawada Makoto",
   "license": "MIT",
-  "dependencies": {
-    "typescript-dotnet-es6": "^4.11.2"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.0",
     "@rollup/plugin-node-resolve": "^15.0.0",
