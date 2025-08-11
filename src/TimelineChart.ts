@@ -44,6 +44,8 @@ export default class TimelineChart {
   private mouseMoveHandler: (ev: MouseEvent) => void;
   private mouseOutHandler: (ev: MouseEvent) => void;
   private resizeHandler: () => void;
+  private resizeObserver?: ResizeObserver;
+  private currentDpr: number = (window as any).devicePixelRatio || 1;
 
   /**
    * 合計（分）
@@ -121,15 +123,8 @@ export default class TimelineChart {
     this.tooltip = new Tooltip();
     this.config = new Config(obj?.config || {});
 
-    // High DPI 対応: 物理ピクセル密度を考慮
-    const dpr = (window as any).devicePixelRatio || 1;
-    const logicalWidth = this.element.clientWidth;
-    const logicalHeight = this.element.clientHeight;
-    if (dpr !== 1) {
-      this.element.width = logicalWidth * dpr;
-      this.element.height = logicalHeight * dpr;
-      this.canvas.scale(dpr, dpr);
-    }
+  // 初期 DPI / サイズ反映
+  this.updateCanvasSize();
 
     // generate time units with validation / clipping
     const startBoundary = this.config.time.start;
@@ -185,6 +180,12 @@ export default class TimelineChart {
       });
     };
     window.addEventListener("resize", this.resizeHandler, false);
+
+    // ResizeObserver で要素サイズ変化をより正確に検知
+    if ((window as any).ResizeObserver) {
+      this.resizeObserver = new ResizeObserver(() => this.handleResize());
+      this.resizeObserver.observe(this.element);
+    }
   }
 
   /**
@@ -397,15 +398,20 @@ export default class TimelineChart {
     }
 
     const padding = this.config.layout.padding;
-  const bw = this.config.borderWidth;
-  const x = padding.left;
-  const y = padding.top;
-  // clientWidth/Height ベースで論理ピクセルサイズを取得
-  const w = this.elementWidth - padding.y - bw;
-  const h = this.elementHeight - padding.x - bw;
-  this.canvas.strokeStyle = this.config.borderColor;
-  this.canvas.lineWidth = bw;
-  this.canvas.strokeRect(x + bw / 2, y + bw / 2, Math.max(0, w), Math.max(0, h));
+    const bw = this.config.borderWidth;
+    const x = padding.left;
+    const y = padding.top;
+    // clientWidth/Height ベースで論理ピクセルサイズを取得
+    const w = this.elementWidth - padding.y - bw;
+    const h = this.elementHeight - padding.x - bw;
+    this.canvas.strokeStyle = this.config.borderColor;
+    this.canvas.lineWidth = bw;
+    this.canvas.strokeRect(
+      x + bw / 2,
+      y + bw / 2,
+      Math.max(0, w),
+      Math.max(0, h)
+    );
   }
 
   /**
@@ -434,6 +440,9 @@ export default class TimelineChart {
     }
     if (this.resizeHandler) {
       window.removeEventListener("resize", this.resizeHandler);
+    }
+    if (this.resizeObserver) {
+      try { this.resizeObserver.disconnect(); } catch {}
     }
   }
   // #endregion
@@ -497,7 +506,7 @@ export default class TimelineChart {
         cursor.setHours(cursor.getHours() + 1);
       }
     }
-  // (上で算出済み)
+    // (上で算出済み)
 
     while (cursor.getTime() < end.getTime()) {
       const hourStartMs = cursor.getTime();
@@ -553,20 +562,28 @@ export default class TimelineChart {
 
   /** リサイズ処理 */
   private handleResize(): void {
-    // 現在の CSS サイズを取得し canvas の内部バッファを更新
-    const dpr = (window as any).devicePixelRatio || 1;
-    const logicalWidth = this.element.clientWidth;
-    const logicalHeight = this.element.clientHeight;
-    // 既に同サイズなら skip
-    if (this.element.width !== logicalWidth * dpr || this.element.height !== logicalHeight * dpr) {
-      this.element.width = logicalWidth * dpr;
-      this.element.height = logicalHeight * dpr;
-      this.canvas.setTransform(1, 0, 0, 1, 0, 0); // reset
+    const newDpr = (window as any).devicePixelRatio || 1;
+    if (newDpr !== this.currentDpr) {
+      this.currentDpr = newDpr;
+    }
+    this.updateCanvasSize();
+    this.draw();
+  }
+
+  /** CSS サイズと DPR に合わせて内部バッファを更新 */
+  private updateCanvasSize(): void {
+    const dpr = this.currentDpr;
+    const cssW = this.element.clientWidth || this.element.width / dpr;
+    const cssH = this.element.clientHeight || this.element.height / dpr;
+    const targetW = Math.max(1, Math.round(cssW * dpr));
+    const targetH = Math.max(1, Math.round(cssH * dpr));
+    if (this.element.width !== targetW || this.element.height !== targetH) {
+      this.element.width = targetW;
+      this.element.height = targetH;
+      this.canvas.setTransform(1, 0, 0, 1, 0, 0);
       if (dpr !== 1) {
         this.canvas.scale(dpr, dpr);
       }
     }
-    // 1分当たり幅は getter なので draw() 内で再計算される
-    this.draw();
   }
 }
