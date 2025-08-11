@@ -128,6 +128,21 @@ class LabelConfig {
    */
   public useEllipsis!: boolean;
 
+  /**
+   * ラベルを折り返して表示するか
+   */
+  public wrap!: boolean;
+
+  /**
+   * 折り返し時の最大行数 (undefined/null なら高さに収まる限り)
+   */
+  public maxLines?: number;
+
+  /**
+   * 行間係数 (フォントサイズ * lineHeight)
+   */
+  public lineHeight!: number;
+
   static from(config: any) {
     const labelConfig = new LabelConfig();
     labelConfig.fontFamily = config.fontFamily || "メイリオ";
@@ -135,6 +150,11 @@ class LabelConfig {
     labelConfig.showLabel = config.showLabel || false;
   labelConfig.minWidthForText = Number(config.minWidthForText || 20); // 20px 未満は読めないので非表示
   labelConfig.useEllipsis = config.useEllipsis !== undefined ? !!config.useEllipsis : true;
+    labelConfig.wrap = !!config.wrap;
+    labelConfig.maxLines = (config.maxLines !== undefined && config.maxLines !== null)
+      ? Number(config.maxLines)
+      : undefined;
+    labelConfig.lineHeight = Number(config.lineHeight || 1.2);
 
     return labelConfig;
   }

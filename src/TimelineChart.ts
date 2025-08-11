@@ -211,35 +211,73 @@ export default class TimelineChart {
         self.canvas.textBaseline = "middle";
         // 最小幅チェック
         if (width >= labelConfig.minWidthForText) {
-          let text = timeUnit.label;
-          // 省略処理: 実際の描画幅を measureText で確認し、幅を超える場合は短縮
-          const available = width - 4; // 左右 2px ずつマージン
-          let measured = self.canvas.measureText(text).width;
-          if (measured > available) {
-            if (!labelConfig.useEllipsis) {
-              // 非表示 (狭すぎ)
-              return;
-            }
-            const ellipsis = "…";
-            const ellipsisWidth = self.canvas.measureText(ellipsis).width;
-            // 二分探索で切れる位置を探す
-            let left = 0;
-            let right = text.length - 1;
-            let cut = 0;
-            while (left <= right) {
-              const mid = (left + right) >> 1;
-              const substr = text.slice(0, mid + 1);
-              const w = self.canvas.measureText(substr).width + ellipsisWidth;
+          const available = width - 4; // 左右マージン
+          const fontSizePx = parseInt(labelConfig.fontSize, 10) || 12;
+          const lineHeight = fontSizePx * (labelConfig.lineHeight || 1.2);
+          const maxLines = labelConfig.maxLines;
+          const verticalCenter = y + height / 2;
+
+          if (labelConfig.wrap) {
+            // 単語境界を気にせず文字単位でラップ (日本語想定)
+            const original = timeUnit.label;
+            const lines: string[] = [];
+            let current = "";
+            for (let i = 0; i < original.length; i++) {
+              const ch = original[i];
+              const test = current + ch;
+              const w = self.canvas.measureText(test).width;
               if (w <= available) {
-                cut = mid + 1;
-                left = mid + 1;
+                current = test;
               } else {
-                right = mid - 1;
+                if (current.length > 0) {
+                  lines.push(current);
+                }
+                current = ch;
+              }
+              if (maxLines && lines.length >= maxLines) {
+                break;
               }
             }
-            text = text.slice(0, cut) + ellipsis;
+            if (current.length > 0 && (!maxLines || lines.length < maxLines)) {
+              lines.push(current);
+            }
+            // maxLines 超過分を省略
+            if (maxLines && lines.length > maxLines) {
+              lines.length = maxLines;
+            }
+            // 縦位置: 全体高さ内で中央揃え
+            const totalTextHeight = lines.length * lineHeight;
+            let startY = verticalCenter - totalTextHeight / 2 + lineHeight / 2;
+            for (let li = 0; li < lines.length; li++) {
+              self.canvas.fillText(lines[li], x + 2, startY + li * lineHeight, available);
+            }
+          } else {
+            let text = timeUnit.label;
+            let measured = self.canvas.measureText(text).width;
+            if (measured > available) {
+              if (!labelConfig.useEllipsis) {
+                return; // 非表示
+              }
+              const ellipsis = "…";
+              const ellipsisWidth = self.canvas.measureText(ellipsis).width;
+              let left = 0;
+              let right = text.length - 1;
+              let cut = 0;
+              while (left <= right) {
+                const mid = (left + right) >> 1;
+                const substr = text.slice(0, mid + 1);
+                const w = self.canvas.measureText(substr).width + ellipsisWidth;
+                if (w <= available) {
+                  cut = mid + 1;
+                  left = mid + 1;
+                } else {
+                  right = mid - 1;
+                }
+              }
+              text = text.slice(0, cut) + ellipsis;
+            }
+            self.canvas.fillText(text, x + 2, verticalCenter, available);
           }
-          self.canvas.fillText(text, x + 2, y + height / 2, available);
         }
       }
     });
