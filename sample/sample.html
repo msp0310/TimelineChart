@@ -94,7 +94,8 @@
           start: "2025-08-11 06:00",
           end:   "2025-08-12 05:59"
         },
-        borderWidth: 1,
+  borderWidth: 1,
+  borderColor: '#ccc',
         backgroundColor: 'white',
         layout: {
           padding: { top: '0px', left: '0px', right: '0px', bottom: '0px' },
@@ -123,8 +124,9 @@
     // 時間帯のみ表示サンプル
     const hourOnly = new TimelineChart(document.getElementById('chartHourOnly'), {
       config: {
-        time: { start: "2025-08-11 06:00", end: "2025-08-11 18:00" },
-        borderWidth: 1,
+        time: { start: "2025-08-11 06:00", end: "2025-08-12 06:00" },
+  borderWidth: 1,
+  borderColor: '#ccc',
         backgroundColor: 'white',
         hourBand: { show: true, only: true, placement: 'bottom', showSeparators: true }
       },
