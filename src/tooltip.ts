@@ -33,10 +33,20 @@ export default class Tooltip {
       this.y - (this.container.offsetHeight + margin) + "px";
   }
 
-  public show(): void {
+    public show(): void {
     // XSS緩和: textContent を用い HTMLは解釈させない
-    if (this.container.textContent !== this.text) {
-      this.container.textContent = this.text;
+      const raw = this.text || '';
+      const escaped = raw
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\"/g, '&quot;');
+      // 元々ユーザが書いた <br> は &lt;br&gt; にエスケープされるのでそれを本物へ戻す
+      const withExplicitBr = escaped.replace(/&lt;br\s*\/?&gt;/gi, '<br>');
+      // '\n' を <br> に
+      const formatted = withExplicitBr.replace(/\n/g, '<br>');
+      if (this.container.innerHTML !== formatted) {
+        this.container.innerHTML = formatted;
     }
     this.container.style.visibility = "visible";
   }
