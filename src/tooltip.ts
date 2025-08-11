@@ -34,11 +34,7 @@ export default class Tooltip {
   }
 
   public show(): void {
-    // XSS緩和: textContent を用い HTMLは解釈させない
-      const raw = (this.text || '').replace(/\n/g, '<br>');
-      if (this.container.innerHTML !== raw) {
-        this.container.innerHTML = raw;
-      }
+    this.container.innerHTML = this.text;
     this.container.style.visibility = "visible";
   }
 

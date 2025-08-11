@@ -99,7 +99,7 @@ export default class TimelineChart {
     }
     this.canvas = ctx as CanvasRenderingContext2D;
     this.tooltip = new Tooltip();
-  this.config = new Config(obj?.config || {});
+    this.config = new Config(obj?.config || {});
 
     // High DPI 対応: 物理ピクセル密度を考慮
     const dpr = (window as any).devicePixelRatio || 1;
@@ -112,10 +112,10 @@ export default class TimelineChart {
     }
 
     // generate time units with validation / clipping
-  const startBoundary = this.config.time.start;
-  const endBoundary = this.config.time.end;
+    const startBoundary = this.config.time.start;
+    const endBoundary = this.config.time.end;
     this.timeUnits = [];
-  (obj?.data || []).forEach((unit: any, index: number) => {
+    (obj?.data || []).forEach((unit: any, index: number) => {
       const rawStart = DateTimeHelper.parse(unit.startTime);
       const rawEnd = DateTimeHelper.parse(unit.endTime);
       // skip invalid
@@ -182,7 +182,10 @@ export default class TimelineChart {
       if (timeUnit.totalMinutes === 0) return;
       // oneMinuteWidth 同期 (リサイズ対応)
       timeUnit.oneMinuteWidth = self.oneMinuteWidth;
-  const startMinutes = DateTime.between(startDateTime, timeUnit.startTime).minutes;
+      const startMinutes = DateTime.between(
+        startDateTime,
+        timeUnit.startTime
+      ).minutes;
       const x = padding.left + borderWidth + startMinutes * self.oneMinuteWidth;
       const y = padding.top + borderWidth;
       const height =
@@ -311,7 +314,9 @@ export default class TimelineChart {
   /** 開始分配列再構築 */
   private rebuildStartMinutesArray(): void {
     const startDateTime = this.config.time.start;
-  this.startMinutesArray = this.timeUnits.map(u => DateTime.between(startDateTime, u.startTime).minutes);
+    this.startMinutesArray = this.timeUnits.map(
+      (u) => DateTime.between(startDateTime, u.startTime).minutes
+    );
   }
 
   /** minutesFromStart に対して開始分が最大で start<= target のユニット index を返す */
