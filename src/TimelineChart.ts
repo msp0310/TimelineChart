@@ -91,6 +91,23 @@ export default class TimelineChart {
     return this.elementHeight;
   }
 
+  /** 時間帯バンド高さ */
+  private get hourBandHeight(): number {
+    return this.config.hourBand?.show ? this.config.hourBand.height : 0;
+  }
+
+  /** ユニット描画領域の上端オフセット */
+  private get unitsTopOffset(): number {
+    if (!this.config.hourBand?.show) return 0;
+    return this.config.hourBand.placement === 'top' ? this.config.hourBand.height : 0;
+  }
+
+  /** ユニット描画領域高さ */
+  private get unitsDrawableHeight(): number {
+    if (!this.config.hourBand?.show) return this.drawableHeight;
+    return this.drawableHeight - this.config.hourBand.height;
+  }
+
   constructor(element: HTMLCanvasElement, obj: any) {
     this.element = element;
     const ctx = this.element.getContext("2d");
@@ -172,11 +189,23 @@ export default class TimelineChart {
     this.drawBackground();
     this.drawBorder();
 
+    // 時間帯バンド
+    if (this.config.hourBand?.show) {
+      this.drawHourBand();
+    }
+
     const borderWidth = this.config.borderWidth;
     const startDateTime = this.config.time.start;
     const labelConfig = this.config.label;
     const padding = this.config.layout.padding;
     const self = this;
+
+    if (this.config.hourBand?.only) {
+      return; // 時間帯のみ表示
+    }
+
+    const unitsTopOffset = this.unitsTopOffset;
+    const unitsHeight = this.unitsDrawableHeight;
 
     this.timeUnits.forEach(function (timeUnit) {
       if (timeUnit.totalMinutes === 0) return;
@@ -187,9 +216,9 @@ export default class TimelineChart {
         timeUnit.startTime
       ).minutes;
       const x = padding.left + borderWidth + startMinutes * self.oneMinuteWidth;
-      const y = padding.top + borderWidth;
+      const y = padding.top + borderWidth + unitsTopOffset;
       const height =
-        self.drawableHeight - borderWidth * 2 - (padding.top + padding.bottom);
+        unitsHeight - borderWidth * 2 - (padding.top + padding.bottom);
       const width = timeUnit.width;
       self.canvas.fillStyle = timeUnit.color || "#fff";
       self.canvas.fillRect(x, y, width, height);
@@ -298,11 +327,19 @@ export default class TimelineChart {
 
     // パディング範囲は無視
     // left, right, top, bottom
+    const unitsTopOffset = this.unitsTopOffset;
+    const unitsHeight = this.unitsDrawableHeight;
+    // ユニット領域外 (時間帯バンド含め) は無視
+    // バンドのみ表示のときはツールチップ無効
+    if (this.config.hourBand?.only) {
+      this.tooltip.hide();
+      return;
+    }
     if (
       x < padding.left ||
       x > this.drawableWidth - padding.right ||
-      y < padding.top ||
-      y > this.drawableHeight - padding.bottom
+      y < padding.top + unitsTopOffset ||
+      y > padding.top + unitsTopOffset + unitsHeight - padding.bottom
     ) {
       this.tooltip.hide();
       return;
@@ -404,5 +441,85 @@ export default class TimelineChart {
       }
     }
     return candidate;
+  }
+
+  /** 時間帯バンド描画 */
+  private drawHourBand(): void {
+    const hb = this.config.hourBand;
+    if (!hb?.show) return;
+    const padding = this.config.layout.padding;
+    const borderWidth = this.config.borderWidth;
+    const start = this.config.time.start.toDate();
+    const end = this.config.time.end.toDate();
+    const oneMinuteWidth = this.oneMinuteWidth;
+    const totalWidth = this.drawableWidth - (padding.left + padding.right);
+    const placementTop = hb.placement === 'top';
+    const yBase = padding.top + borderWidth + (placementTop ? 0 : this.unitsDrawableHeight);
+
+    // 背景帯
+    this.canvas.save();
+    this.canvas.font = hb.fontSize + ' ' + hb.fontFamily;
+    this.canvas.textBaseline = 'middle';
+    this.canvas.fillStyle = hb.color;
+
+    // 開始を次の「分=0」へ丸め
+    const cursor = new Date(start.getTime());
+    if (cursor.getMinutes() !== 0 || cursor.getSeconds() !== 0) {
+      cursor.setMinutes(0, 0, 0);
+      if (cursor.getTime() < start.getTime()) {
+        cursor.setHours(cursor.getHours() + 1);
+      }
+    }
+    const hourHeight = hb.height;
+    const bandY = placementTop ? yBase : yBase - hb.height;
+
+    while (cursor.getTime() < end.getTime()) {
+      const hourStartMs = cursor.getTime();
+      const hourEndMs = new Date(cursor.getTime());
+      hourEndMs.setHours(hourEndMs.getHours() + 1);
+      const clampedEnd = Math.min(hourEndMs.getTime(), end.getTime());
+      const minutesFromStart = (hourStartMs - start.getTime()) / 60000;
+      const minutesLen = (clampedEnd - hourStartMs) / 60000;
+      const x = padding.left + borderWidth + minutesFromStart * oneMinuteWidth;
+      const w = minutesLen * oneMinuteWidth;
+
+      // 交互塗り
+      if (hb.alternateFill && (cursor.getHours() % 2 === 1)) {
+        this.canvas.fillStyle = hb.alternateFill;
+        this.canvas.fillRect(x, bandY, w, hourHeight);
+      }
+
+      // 区切り線
+      if (hb.showSeparators) {
+        this.canvas.strokeStyle = hb.lineColor;
+        this.canvas.lineWidth = 1;
+        this.canvas.beginPath();
+        this.canvas.moveTo(x + 0.5, bandY);
+        this.canvas.lineTo(x + 0.5, bandY + hourHeight);
+        this.canvas.stroke();
+      }
+
+      // 時刻ラベル
+      this.canvas.fillStyle = hb.color;
+      const hourStr = ('0' + cursor.getHours()).slice(-2);
+      const textX = x + 2;
+      const textY = bandY + hourHeight / 2;
+      this.canvas.fillText(hourStr, textX, textY, w - 4);
+
+      // 次の時間へ
+      cursor.setHours(cursor.getHours() + 1, 0, 0, 0);
+    }
+
+    // 外枠線（バンド区切り）
+    this.canvas.strokeStyle = hb.lineColor;
+    this.canvas.lineWidth = 1;
+    this.canvas.strokeRect(
+      padding.left + borderWidth,
+      bandY,
+      this.drawableWidth - (padding.left + padding.right) - borderWidth * 2,
+      hourHeight
+    );
+
+    this.canvas.restore();
   }
 }

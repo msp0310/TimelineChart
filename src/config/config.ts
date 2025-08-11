@@ -42,6 +42,11 @@ export class Config {
   public label: LabelConfig;
 
   /**
+   * 時間帯（時刻HH）バンド設定
+   */
+  public hourBand: HourBandConfig;
+
+  /**
    * Constructor
    * @param config Config
    */
@@ -54,6 +59,7 @@ export class Config {
     this.layout = LayoutConfig.from(config.layout || {});
     this.time = TimeConfig.from(config.time || {});
     this.label = LabelConfig.from(config.label || {});
+  this.hourBand = HourBandConfig.from(config.hourBand || {});
   }
 }
 
@@ -177,6 +183,37 @@ class LayoutConfig {
     );
 
     return config;
+  }
+}
+
+/**
+ * 時間帯(時間)バンド設定
+ */
+class HourBandConfig {
+  public show!: boolean; // 表示するか
+  public only!: boolean; // これのみ表示（ユニット非表示）
+  public placement!: 'top' | 'bottom'; // 位置
+  public height!: number; // バンド高さ
+  public fontSize!: string;
+  public fontFamily!: string;
+  public color!: string;
+  public lineColor!: string; // 区切り線色
+  public showSeparators!: boolean; // 区切り線を表示
+  public alternateFill?: string; // 偶数/奇数時間で背景交互塗りつぶし(オッド時間)
+
+  static from(config: any): HourBandConfig {
+    const c = new HourBandConfig();
+    c.show = !!config.show;
+    c.only = !!config.only;
+    c.placement = config.placement === 'top' ? 'top' : 'bottom';
+    c.height = Number(config.height || 20);
+    c.fontSize = config.fontSize || '10px';
+    c.fontFamily = config.fontFamily || 'メイリオ';
+    c.color = config.color || '#000';
+    c.lineColor = config.lineColor || '#ccc';
+    c.showSeparators = config.showSeparators !== undefined ? !!config.showSeparators : true;
+    c.alternateFill = config.alternateFill; // 例: 'rgba(0,0,0,0.03)'
+    return c;
   }
 }
 
