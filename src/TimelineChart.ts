@@ -384,16 +384,15 @@ export default class TimelineChart {
     }
 
     const padding = this.config.layout.padding;
-
-    // top and bottom
-    this.canvas.strokeStyle = this.config.borderColor;
-    this.canvas.lineWidth = this.config.borderWidth * 2;
-    this.canvas.strokeRect(
-      padding.left,
-      padding.top,
-      this.element.width - padding.y,
-      this.element.height - padding.x
-    );
+  const bw = this.config.borderWidth;
+  const x = padding.left;
+  const y = padding.top;
+  // clientWidth/Height ベースで論理ピクセルサイズを取得
+  const w = this.elementWidth - padding.y - bw;
+  const h = this.elementHeight - padding.x - bw;
+  this.canvas.strokeStyle = this.config.borderColor;
+  this.canvas.lineWidth = bw;
+  this.canvas.strokeRect(x + bw / 2, y + bw / 2, Math.max(0, w), Math.max(0, h));
   }
 
   /**
@@ -521,15 +520,17 @@ export default class TimelineChart {
       cursor.setHours(cursor.getHours() + 1, 0, 0, 0);
     }
 
-    // 外枠線（バンド区切り）
-    this.canvas.strokeStyle = hb.lineColor;
-    this.canvas.lineWidth = 1;
-    this.canvas.strokeRect(
-      padding.left + borderWidth,
-      bandY,
-      this.drawableWidth - borderWidth * 2,
-      hourHeight
-    );
+    // 外枠線（バンド区切り）: only モードでは全体枠線を優先するため省略
+    if (!hb.only) {
+      this.canvas.strokeStyle = hb.lineColor;
+      this.canvas.lineWidth = 1;
+      this.canvas.strokeRect(
+        padding.left + borderWidth,
+        bandY,
+        this.drawableWidth - borderWidth * 2,
+        hourHeight
+      );
+    }
 
     this.canvas.restore();
   }
