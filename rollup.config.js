@@ -1,8 +1,10 @@
 import nodeResolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
-import { readFileSync } from 'fs';
-const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf-8'));
+import { readFileSync } from "fs";
+const pkg = JSON.parse(
+  readFileSync(new URL("./package.json", import.meta.url), "utf-8")
+);
 
 const banner = `/*!\n * TimelineChart v${
   pkg.version
@@ -14,12 +16,12 @@ export default {
     file: "dist/TimelineChart.js",
     format: "umd",
     name: "TimelineChart",
-  banner,
-  sourcemap: true,
+    banner,
+    sourcemap: true,
   },
   plugins: [
-  nodeResolve(),
-  commonjs(),
-  typescript({ tsconfig: './tsconfig.json' })
+    nodeResolve(),
+    commonjs(),
+    typescript({ tsconfig: "./tsconfig.json" }),
   ],
 };

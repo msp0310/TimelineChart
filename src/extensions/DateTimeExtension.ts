@@ -10,7 +10,7 @@ export default class DateTimeHelper {
    *  - ISO 8601 (YYYY-MM-DDTHH:mm[:ss])
    */
   public static parse(dateString: string): DateTime {
-    if (!dateString) return DateTime.parseHM('00:00');
+    if (!dateString) return DateTime.parseHM("00:00");
     const raw = dateString.trim();
 
     // ISO 8601
