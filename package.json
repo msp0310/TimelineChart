@@ -2,7 +2,8 @@
   "name": "timeline-chart",
   "version": "0.1.4",
   "description": "",
-  "main": "timeline-chart.js",
+  "main": "dist/TimelineChart.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "node ./node_modules/rollup/bin/rollup -c",
     "watch": "node ./node_modules/rollup/bin/rollup -c --watch",

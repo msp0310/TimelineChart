@@ -1,5 +1,5 @@
 import TimeUnitElement from "../TimeUnitElement";
-import DateTime from "typescript-dotnet-es6/System/Time/DateTime"
+import DateTime from "typescript-dotnet-es6/System/Time/DateTime";
 import DateTimeHelper from "../extensions/DateTimeExtension";
 
 /**

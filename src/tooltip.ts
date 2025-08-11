@@ -37,38 +37,39 @@ export default class Tooltip
 
   public show (): void
   {
-    if (this.container.innerHTML !== this.text) {
-      this.container.innerHTML = this.text;
+    // XSS緩和: textContent を用い HTMLは解釈させない
+    if (this.container.textContent !== this.text) {
+      this.container.textContent = this.text;
     }
     this.container.style.visibility = "visible";
   }
 
   public hide (): void
   {
-    if (!this.container.innerHTML) {
-      this.container.innerHTML = "";
+    if (!this.container.textContent) {
+      this.container.textContent = "";
     }
     this.container.style.visibility = "collapse";
   }
 
   private getOrCreateTooltipContainer (id: string): HTMLElement
   {
-    let containerElement: HTMLElement = document.getElementById(id);
+    let containerElement: HTMLElement | null = document.getElementById(id);
     if (containerElement) {
       return containerElement;
     }
 
-    containerElement = document.createElement("div");
-    containerElement.id = id;
-    containerElement.style.width = "auto";
-    containerElement.style.height = "auto";
-    containerElement.style.position = "absolute";
-    containerElement.style.border = "1px solid #ccc";
-    containerElement.style.background = "#fff";
-    containerElement.style.visibility = "collapse";
-    containerElement.style.padding = "5px";
-    containerElement.style.zIndex = '99999';
-    document.getElementsByTagName("body")[0].appendChild(containerElement);
-    return containerElement;
+    const created = document.createElement("div");
+    created.id = id;
+    created.style.width = "auto";
+    created.style.height = "auto";
+    created.style.position = "absolute";
+    created.style.border = "1px solid #ccc";
+    created.style.background = "#fff";
+    created.style.visibility = "collapse";
+    created.style.padding = "5px";
+    created.style.zIndex = '99999';
+    document.getElementsByTagName("body")[0].appendChild(created);
+    return created;
   }
 }
