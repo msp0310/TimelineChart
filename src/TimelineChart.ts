@@ -232,17 +232,32 @@ export default class TimelineChart {
       self.canvas.fillRect(x, y, width, height);
 
       if (labelConfig.showLabel && timeUnit.label) {
-        // 背景色から簡易的にコントラスト判定 (輝度計算) して文字色を黒/白
-        const rgb = self.canvas.fillStyle.match(/rgba?\((\d+),(\d+),(\d+)/);
-        let textColor = "black";
-        if (rgb) {
-          const r = parseInt(rgb[1], 10),
-            g = parseInt(rgb[2], 10),
-            b = parseInt(rgb[3], 10);
+        // 自動コントラスト
+        if (labelConfig.autoContrast) {
+          const fill = String(self.canvas.fillStyle);
+          let r = 0, g = 0, b = 0;
+          if (fill.startsWith('#')) {
+            const hex = fill.slice(1);
+            if (hex.length === 3) {
+              r = parseInt(hex[0] + hex[0], 16);
+              g = parseInt(hex[1] + hex[1], 16);
+              b = parseInt(hex[2] + hex[2], 16);
+            } else if (hex.length === 6) {
+              r = parseInt(hex.substring(0,2), 16);
+              g = parseInt(hex.substring(2,4), 16);
+              b = parseInt(hex.substring(4,6), 16);
+            }
+          } else {
+            const m = fill.match(/rgba?\((\d+),(\d+),(\d+)/);
+            if (m) {
+              r = parseInt(m[1],10); g = parseInt(m[2],10); b = parseInt(m[3],10);
+            }
+          }
           const l = 0.299 * r + 0.587 * g + 0.114 * b;
-          textColor = l < 140 ? "white" : "black";
+          self.canvas.fillStyle = l < labelConfig.contrastThreshold ? 'white' : 'black';
+        } else {
+          self.canvas.fillStyle = 'black';
         }
-        self.canvas.fillStyle = textColor;
         self.canvas.font = labelConfig.fontSize + " " + labelConfig.fontFamily;
         // 垂直中央寄せ (テキストベースライン調整)
         self.canvas.textBaseline = "middle";

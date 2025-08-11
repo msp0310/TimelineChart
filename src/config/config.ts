@@ -59,7 +59,7 @@ export class Config {
     this.layout = LayoutConfig.from(config.layout || {});
     this.time = TimeConfig.from(config.time || {});
     this.label = LabelConfig.from(config.label || {});
-  this.hourBand = HourBandConfig.from(config.hourBand || {});
+    this.hourBand = HourBandConfig.from(config.hourBand || {});
   }
 }
 
@@ -149,18 +149,30 @@ class LabelConfig {
    */
   public lineHeight!: number;
 
+  /** 背景色から自動で白/黒を選ぶ */
+  public autoContrast!: boolean;
+
+  /** しきい値 (0-255)。これ未満なら白文字、それ以外黒文字 */
+  public contrastThreshold!: number;
+
   static from(config: any) {
     const labelConfig = new LabelConfig();
     labelConfig.fontFamily = config.fontFamily || "メイリオ";
     labelConfig.fontSize = config.fontSize || "14px";
     labelConfig.showLabel = config.showLabel || false;
-  labelConfig.minWidthForText = Number(config.minWidthForText || 20); // 20px 未満は読めないので非表示
-  labelConfig.useEllipsis = config.useEllipsis !== undefined ? !!config.useEllipsis : true;
+    labelConfig.minWidthForText = Number(config.minWidthForText || 20); // 20px 未満は読めないので非表示
+    labelConfig.useEllipsis =
+      config.useEllipsis !== undefined ? !!config.useEllipsis : true;
     labelConfig.wrap = !!config.wrap;
-    labelConfig.maxLines = (config.maxLines !== undefined && config.maxLines !== null)
-      ? Number(config.maxLines)
-      : undefined;
+    labelConfig.maxLines =
+      config.maxLines !== undefined && config.maxLines !== null
+        ? Number(config.maxLines)
+        : undefined;
     labelConfig.lineHeight = Number(config.lineHeight || 1.2);
+    labelConfig.autoContrast = config.autoContrast !== undefined ? !!config.autoContrast : true;
+    labelConfig.contrastThreshold = Number(
+      config.contrastThreshold !== undefined ? config.contrastThreshold : 140
+    );
 
     return labelConfig;
   }
@@ -192,7 +204,7 @@ class LayoutConfig {
 class HourBandConfig {
   public show!: boolean; // 表示するか
   public only!: boolean; // これのみ表示（ユニット非表示）
-  public placement!: 'top' | 'bottom'; // 位置
+  public placement!: "top" | "bottom"; // 位置
   public height!: number; // バンド高さ
   public fontSize!: string;
   public fontFamily!: string;
@@ -205,13 +217,14 @@ class HourBandConfig {
     const c = new HourBandConfig();
     c.show = !!config.show;
     c.only = !!config.only;
-    c.placement = config.placement === 'top' ? 'top' : 'bottom';
+    c.placement = config.placement === "top" ? "top" : "bottom";
     c.height = Number(config.height || 20);
-    c.fontSize = config.fontSize || '10px';
-    c.fontFamily = config.fontFamily || 'メイリオ';
-    c.color = config.color || '#000';
-    c.lineColor = config.lineColor || '#ccc';
-    c.showSeparators = config.showSeparators !== undefined ? !!config.showSeparators : true;
+    c.fontSize = config.fontSize || "10px";
+    c.fontFamily = config.fontFamily || "メイリオ";
+    c.color = config.color || "#000";
+    c.lineColor = config.lineColor || "#ccc";
+    c.showSeparators =
+      config.showSeparators !== undefined ? !!config.showSeparators : true;
     c.alternateFill = config.alternateFill; // 例: 'rgba(0,0,0,0.03)'
     return c;
   }
