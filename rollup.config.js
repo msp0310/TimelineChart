@@ -14,12 +14,11 @@ export default {
     file: "dist/TimelineChart.js",
     format: "umd",
     name: "TimelineChart",
-    banner,
+  banner,
+  sourcemap: true,
   },
   plugins: [
-    nodeResolve({
-      jsNext: true,
-    }),
+  nodeResolve(),
   commonjs(),
   typescript({ tsconfig: './tsconfig.json' })
   ],

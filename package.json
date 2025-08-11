@@ -3,7 +3,15 @@
   "version": "0.1.4",
   "description": "",
   "main": "dist/TimelineChart.js",
-  "types": "dist/index.d.ts",
+  "module": "dist/TimelineChart.js",
+  "types": "dist/TimelineChart.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/TimelineChart.d.ts",
+      "default": "./dist/TimelineChart.js"
+    }
+  },
+  "type": "module",
   "scripts": {
     "build": "rollup -c",
     "watch": "rollup -c --watch",

@@ -99,8 +99,7 @@ export default class TimelineChart {
     }
     this.canvas = ctx as CanvasRenderingContext2D;
     this.tooltip = new Tooltip();
-  var _cfg = (obj && obj.config) ? obj.config : {};
-  this.config = new Config(_cfg);
+  this.config = new Config(obj?.config || {});
 
     // High DPI 対応: 物理ピクセル密度を考慮
     const dpr = (window as any).devicePixelRatio || 1;
@@ -116,8 +115,7 @@ export default class TimelineChart {
     const startBoundary = this.config.time.start;
     const endBoundary = this.config.time.end;
     this.timeUnits = [];
-  var _dataArray = (obj && obj.data) ? obj.data : [];
-  _dataArray.forEach((unit: any, index: number) => {
+  (obj?.data || []).forEach((unit: any, index: number) => {
       const rawStart = DateTimeHelper.parse(unit.startTime);
       const rawEnd = DateTimeHelper.parse(unit.endTime);
       // skip invalid
