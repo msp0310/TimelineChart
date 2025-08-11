@@ -28,47 +28,73 @@
   <pre id="data"></pre>
 
   <script>
-    const data = [{
-      "startTime": "06:00",
-      "endTime": "07:00",
-      "color": "rgba(255,0,0,1.0)",
-      "label": "計画停止"
-    }, {
-      "startTime": "07:00",
-      "endTime": "12:00",
-      "color": "rgba(0,255,0,1.0)",
-      "label": "正常"
-    }, {
-      "startTime": "12:00",
-      "endTime": "13:00",
-      "color": "rgba(255,0,0,1.0)",
-      "label": "計画停止"
-    }, {
-      "startTime": "17:00",
-      "endTime": "18:00",
-      "color": "rgba(255,0,0,1.0)",
-      "label": "計画停止BBBBBBB"
-    }]
+    // 24時間基準: 2025/08/11 06:00 ～ 2025/08/12 05:59
+    // フル日付形式 (YYYY-MM-DD HH:mm) を使用
+    const data = [
+      {
+        startTime: "2025-08-11 06:00",
+        endTime:   "2025-08-11 07:00",
+        color: "rgba(255,0,0,1.0)",
+        label: "計画停止"
+      },
+      {
+        startTime: "2025-08-11 07:00",
+        endTime:   "2025-08-11 12:00",
+        color: "rgba(0,255,0,1.0)",
+        label: "正常"
+      },
+      {
+        startTime: "2025-08-11 12:00",
+        endTime:   "2025-08-11 13:00",
+        color: "rgba(255,0,0,1.0)",
+        label: "計画停止 (昼休み)"
+      },
+      {
+        startTime: "2025-08-11 17:00",
+        endTime:   "2025-08-11 18:00",
+        color: "rgba(255,0,0,1.0)",
+        label: "計画停止 (夕方)"
+      },
+      {
+        startTime: "2025-08-11 23:30",
+        endTime:   "2025-08-12 00:30",
+        color: "rgba(0,128,255,1.0)",
+        label: "夜間メンテ"
+      },
+      {
+        startTime: "2025-08-12 01:00",
+        endTime:   "2025-08-12 03:00",
+        color: "rgba(0,255,0,1.0)",
+        label: "正常 (深夜)"
+      },
+      {
+        startTime: "2025-08-12 03:00",
+        endTime:   "2025-08-12 04:00",
+        color: "rgba(255,165,0,1.0)",
+        label: "警告 (負荷高)"
+      },
+      {
+        startTime: "2025-08-12 04:30",
+        endTime:   "2025-08-12 05:30",
+        color: "rgba(0,255,0,1.0)",
+        label: "正常 (明け方)"
+      }
+    ];
 
-    // output
+    // 表示用
     document.getElementById('data').innerText = JSON.stringify(data, null, 2);
 
-    // draw chart.
+    // チャート描画
     const chart = new TimelineChart(document.getElementById('chart'), {
       config: {
         time: {
-          start: "06:00",
-          end: "24:00"
+          start: "2025-08-11 06:00",
+          end:   "2025-08-12 05:59"
         },
         borderWidth: 1,
         backgroundColor: 'white',
         layout: {
-          padding: {
-            top: '0px',
-            left: '0px',
-            right: '0px',
-            bottom: '0px'
-          },
+          padding: { top: '0px', left: '0px', right: '0px', bottom: '0px' },
         },
         label: {
           showLabel: true,
@@ -76,16 +102,12 @@
           fontSize: '12px',
         },
         tooltip: function (unit) {
-          return `開始時間: ${ unit.startTimeText }
-          <br>終了時間: ${unit.endTimeText }
-          <br>ラベル: ${unit.label }`
+          return `開始: ${unit.startTimeText}<br>終了: ${unit.endTimeText}<br>ラベル: ${unit.label}`
         }
       },
       data: data
     });
-    console.log(chart)
     chart.draw();
-
   </script>
 </body>
 
